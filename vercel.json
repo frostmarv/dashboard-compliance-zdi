@@ -1,8 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/",
-      "destination": "/evaluasi-dashboard/index.html"
+      "source": "/(.*)",
+      "destination": "/evaluasi-dashboard/$1"
     }
   ]
 }
