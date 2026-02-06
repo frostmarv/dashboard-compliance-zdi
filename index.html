@@ -2,22 +2,356 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Evaluasi Karyawan</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Evaluasi Training - Zinus Dream Indonesia</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      background-color: #e9fbf0;
+      font-family: 'Inter', Arial, sans-serif;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ===============================
+       NAVBAR - HIJAU TOSKA
+       =============================== */
+    .navbar {
+      background-color: #329f96;
+      color: white;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .navbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .navbar-logo {
+      height: 32px;
+    }
+
+    .navbar-text {
+      font-weight: bold;
+      font-size: 18px;
+      letter-spacing: -0.3px;
+    }
+
+    .navbar-hyundai {
+      height: 32px;
+    }
+
+    /* ===============================
+       HERO SECTION
+       =============================== */
+    .hero {
+      background: linear-gradient(135deg, #329f96 0%, #2d8e87 100%);
+      color: white;
+      padding: 60px 20px;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: 32px;
+      font-weight: bold;
+      margin-bottom: 16px;
+      letter-spacing: -0.5px;
+    }
+
+    .hero p {
+      font-size: 18px;
+      max-width: 700px;
+      margin: 0 auto 32px;
+      line-height: 1.6;
+    }
+
+    /* ===============================
+       CARD CONTAINER
+       =============================== */
+    .card-container {
+      max-width: 500px;
+      margin: -40px auto 40px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(50, 159, 150, 0.2);
+      padding: 32px;
+    }
+
+    .card-title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #1a1a1a;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .card-subtitle {
+      color: #6b7280;
+      margin-bottom: 28px;
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    /* ===============================
+       BUTTON STYLES
+       =============================== */
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 14px 20px;
+      margin-bottom: 12px;
+      border-radius: 8px;
+      font-weight: bold;
+      text-decoration: none;
+      text-align: center;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+
+    .btn-primary {
+      background-color: #329f96;
+      color: white;
+      border-color: #329f96;
+    }
+
+    .btn-primary:hover {
+      background-color: white;
+      color: #329f96;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(50, 159, 150, 0.3);
+    }
+
+    .btn-secondary {
+      background-color: #1f2937;
+      color: white;
+      border-color: #1f2937;
+    }
+
+    .btn-secondary:hover {
+      background-color: white;
+      color: #1f2937;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(31, 41, 55, 0.3);
+    }
+
+    .btn-danger {
+      background-color: #dc2626;
+      color: white;
+      border-color: #dc2626;
+    }
+
+    .btn-danger:hover {
+      background-color: white;
+      color: #dc2626;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(220, 38, 38, 0.3);
+    }
+
+    /* ===============================
+       FEATURES SECTION
+       =============================== */
+    .features {
+      padding: 60px 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .features-title {
+      text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+      color: #1a1a1a;
+      margin-bottom: 40px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 24px;
+    }
+
+    .feature-card {
+      background: white;
+      padding: 28px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-8px);
+    }
+
+    .feature-icon {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #329f96 0%, #2d8e87 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      color: white;
+      font-size: 24px;
+    }
+
+    .feature-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #1a1a1a;
+      margin-bottom: 12px;
+    }
+
+    .feature-desc {
+      color: #6b7280;
+      line-height: 1.6;
+    }
+
+    /* ===============================
+       FOOTER - HIJAU TOSKA
+       =============================== */
+    .footer {
+      background-color: #329f96;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      margin-top: auto;
+      border-top: 2px solid #329f96;
+    }
+
+    .footer-text {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    /* ===============================
+       RESPONSIVE
+       =============================== */
+    @media (max-width: 768px) {
+      .navbar {
+        flex-direction: column;
+        gap: 12px;
+        padding: 16px;
+      }
+
+      .navbar-brand {
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .navbar-text {
+        font-size: 16px;
+      }
+
+      .hero h1 {
+        font-size: 26px;
+      }
+
+      .hero p {
+        font-size: 16px;
+      }
+
+      .card-container {
+        margin: -30px auto 30px;
+        padding: 24px;
+      }
+
+      .features {
+        padding: 40px 16px;
+      }
+
+      .features-title {
+        font-size: 24px;
+      }
+
+      .feature-card {
+        padding: 24px;
+      }
+    }
+  </style>
 </head>
-<body class="bg-gradient-to-r from-blue-600 to-indigo-700 min-h-screen flex items-center justify-center">
+<body>
 
-<div class="bg-white p-8 rounded shadow max-w-md w-full text-center">
-  <h1 class="text-2xl font-bold mb-4">Dashboard Evaluasi</h1>
-  <p class="text-gray-600 mb-6">Monitoring hasil evaluasi karyawan</p>
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <img src="assets/images/zinus-putih.webp" alt="Zinus Logo" class="navbar-logo">
+      <span class="navbar-text">Zinus Dream Indonesia</span>
+    </div>
+    <img src="assets/images/hyundai-ori-hitam.png" alt="Hyundai Logo" class="navbar-hyundai">
+  </nav>
 
-  <div class="space-y-3">
-    <a href="./evaluasi-dashboard/dashboard.html" class="block bg-blue-600 text-white py-2 rounded hover:bg-blue-700">Dashboard Monitoring</a>
-    <a href="./evaluasi-dashboard/evaluasi1.html" class="block bg-gray-800 text-white py-2 rounded">Evaluasi 1</a>
-    <a href="./evaluasi-dashboard/evaluasi2.html" class="block bg-gray-800 text-white py-2 rounded">Evaluasi 2</a>
-    <a href="./evaluasi-dashboard/double-input.html" class="block bg-red-600 text-white py-2 rounded">Double Input</a>
+  <!-- HERO SECTION -->
+  <section class="hero">
+    <h1>Portal Live Monitoring Evaluasi</h1>
+    <p>Selamat datang di portal live monitoring evaluasi, website ini merupakan monitoring secara real-time dan akurat</p>
+  </section>
+
+  <!-- CARD CONTAINER - BUTTONS -->
+  <div class="card-container">
+    <h2 class="card-title">Dashboard Evaluasi</h2>
+    <p class="card-subtitle">Monitoring hasil evaluasi karyawan secara real-time</p>
+    
+    <a href="evaluasi-dashboard/dashboard.html" class="btn btn-primary">Dashboard Monitoring</a>
+    <a href="evaluasi-dashboard/evaluasi1.html" class="btn btn-secondary">Evaluasi 1</a>
+    <a href="evaluasi-dashboard/evaluasi2.html" class="btn btn-secondary">Evaluasi 2</a>
+    <a href="evaluasi-dashboard/double-input.html" class="btn btn-danger">Double Input</a>
   </div>
-</div>
+
+  <!-- FEATURES SECTION -->
+  <section class="features">
+    <h2 class="features-title">Fitur Unggulan</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width: 32px; height: 32px;">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+        </div>
+        <h3 class="feature-title">Real-Time Monitoring</h3>
+        <p class="feature-desc">Data terupdate secara langsung tanpa delay</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width: 32px; height: 32px;">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          </svg>
+        </div>
+        <h3 class="feature-title">Data Akurat</h3>
+        <p class="feature-desc">Informasi yang valid dan terpercaya</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width: 32px; height: 32px;">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <h3 class="feature-title">User Friendly</h3>
+        <p class="feature-desc">Antarmuka yang mudah digunakan</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p class="footer-text">© 2026 copyright compliance team | ZDI</p>
+  </footer>
 
 </body>
 </html>
