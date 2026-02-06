@@ -4,7 +4,8 @@
 
   // Google Sheets URLs
   const SHEETS = {
-    evaluasi1: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT6w6f01zKeCm8Xzx2nFGk1qGXVQbeOTHK8G6MoJLrjhM-XfGjgYE-Vq2eKMtOh6VboifRXZvSrW0R_/pub?output=csv'
+    evaluasi1: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT6w6f01zKeCm8Xzx2nFGk1qGXVQbeOTHK8G6MoJLrjhM-XfGjgYE-Vq2eKMtOh6VboifRXZvSrW0R_/pub?output=csv',
+    evaluasi2: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQgocuvj3VAPt3n7xYgzHxWcECqxmu26KBO-rJQqAg6XlI_AKutOuZlP3PNznjeRyrBbtgzkAksL8mn/pub?gid=916136123&single=true&output=csv' // ⚠️ GANTI DENGAN LINK SHEET EVALUASI 2
   };
 
   // Parse CSV
@@ -43,7 +44,11 @@
 
   // Fetch Google Sheet
   const fetchSheet = async function(type) {
-    if (!SHEETS[type]) throw new Error(`Unknown sheet type: ${type}`);
+    if (!SHEETS[type]) {
+      console.error(`❌ Unknown sheet type: ${type}`);
+      console.error('Available types:', Object.keys(SHEETS).join(', '));
+      throw new Error(`Unknown sheet type: ${type}. Available: ${Object.keys(SHEETS).join(', ')}`);
+    }
     try {
       console.log(`📊 Fetching sheet: ${type}...`);
       const res = await fetch(SHEETS[type], { method: 'GET', headers: { 'Accept': 'text/csv' } });
@@ -112,7 +117,10 @@
 
   // Export to CSV
   const exportToCSV = function(filename, rows) {
-    if (!rows || rows.length === 0) return;
+    if (!rows || rows.length === 0) {
+      console.warn('⚠️ No data to export');
+      return;
+    }
     const headers = Object.keys(rows[0]).join(',');
     const escapedRows = rows.map(row => Object.values(row).map(val => {
       if (val == null) return '""';
@@ -129,10 +137,12 @@
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+    console.log(`✅ Exported ${rows.length} rows to ${filename}`);
   };
 
   // Export department detail
   const exportDepartemenDetail = async function(type) {
+    if (!SHEETS[type]) throw new Error(`Unknown sheet type: ${type}`);
     const data = await fetchSheet(type);
     const grouped = groupByDepartmentFiltered(data);
     const rows = [];
@@ -141,15 +151,18 @@
         rows.push({ departemen: dept, nama: item.nama, timestamp: item.timestamp });
       }
     }
-    exportToCSV('detail_departemen_unik.csv', rows);
+    const filename = `detail_departemen_unik_${type}.csv`;
+    exportToCSV(filename, rows);
   };
 
   // Export double input
   const exportDoubleInput = async function(type) {
+    if (!SHEETS[type]) throw new Error(`Unknown sheet type: ${type}`);
     const data = await fetchSheet(type);
     const doubles = findDuplicateNames(data);
     const clean = doubles.map(({ _key, ...rest }) => rest);
-    exportToCSV('double_input.csv', clean);
+    const filename = `double_input_${type}.csv`;
+    exportToCSV(filename, clean);
   };
 
   // Export to window - this is critical!
@@ -164,7 +177,9 @@
   window.exportDoubleInput = exportDoubleInput;
 
   console.log('%c✅ sheets.js loaded - All functions ready!', 'color: green; font-weight: bold; font-size: 13px');
-  console.log('  ✓ getDepartmentSummary:', typeof window.getDepartmentSummary);
+  console.log('  ✓ Available sheets:', Object.keys(SHEETS).join(', '));
   console.log('  ✓ fetchSheet:', typeof window.fetchSheet);
+  console.log('  ✓ uniqueByName:', typeof window.uniqueByName);
+  console.log('  ✓ getDepartmentSummary:', typeof window.getDepartmentSummary);
 
 })();

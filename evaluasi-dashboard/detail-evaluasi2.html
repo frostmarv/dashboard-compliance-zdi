@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Detail Evaluasi Training 2</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ===============================
+       GLOBAL THEME
+       =============================== */
+    body {
+      background-color: #e9fbf0;
+      font-family: Arial, sans-serif;
+      color: #333;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+
+    /* ===============================
+       HEADER - HIJAU TOSKA
+       =============================== */
+    .page-header {
+      background-color: #329f96;
+      color: white;
+      border-bottom: 2px solid #329f96;
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .page-header h1 {
+      font-size: 18px;
+      font-weight: bold;
+      margin: 0;
+      letter-spacing: 0.5px;
+    }
+
+    /* ===============================
+       BUTTONS CONTAINER
+       =============================== */
+    .buttons-container {
+      max-width: 7xl;
+      margin: 16px auto 0;
+      padding: 0 16px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* ===============================
+       BUTTONS
+       =============================== */
+    .btn {
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 14px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      border: 2px solid;
+      cursor: pointer;
+    }
+
+    .btn-back {
+      background-color: #329f96;
+      color: white;
+      border-color: #329f96;
+    }
+
+    .btn-back:hover {
+      background-color: white;
+      color: #329f96;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-back::before {
+      content: "← ";
+      margin-right: 6px;
+      font-weight: bold;
+    }
+
+    .btn-export {
+      background-color: #10b981;
+      color: white;
+      border-color: #10b981;
+    }
+
+    .btn-export:hover {
+      background-color: white;
+      color: #10b981;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-export::before {
+      content: "📥 ";
+      margin-right: 6px;
+    }
+
+    /* ===============================
+       CARD / CONTAINER - PUTIH
+       =============================== */
+    .card {
+      background-color: white;
+      border: 2px solid #329f96;
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    /* ===============================
+       TABLE CONTAINER
+       =============================== */
+    .table-container {
+      flex: 1;
+      overflow-x: auto;
+      overflow-y: auto;
+      max-height: calc(100vh - 300px);
+      
+      /* Sembunyikan scrollbar */
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .table-container::-webkit-scrollbar {
+      display: none;
+    }
+
+    table {
+      width: 100%;
+      min-width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    thead {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    thead th {
+      background-color: #329f96;
+      color: white;
+      padding: 12px 16px;
+      text-align: left;
+      font-weight: bold;
+      font-size: 14px;
+      white-space: nowrap;
+      border-bottom: 2px solid #329f96;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+
+    tbody tr:hover {
+      background-color: #f0f8ff;
+    }
+
+    tbody td {
+      padding: 12px 16px;
+      white-space: nowrap;
+      font-weight: 600;
+    }
+
+    tbody td:first-child {
+      text-align: left;
+      font-weight: 600;
+      color: #4b5563;
+    }
+
+    tbody td:not(:first-child) {
+      text-align: left;
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+
+    /* ===============================
+       SEARCH BAR
+       =============================== */
+    .search-container {
+      padding: 12px 16px;
+      background-color: #f9fafb;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    #searchInput {
+      width: 100%;
+      padding: 10px 16px;
+      border: 2px solid #329f96;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    #searchInput:focus {
+      outline: none;
+      border-color: #329f96;
+      box-shadow: 0 0 0 3px rgba(50, 159, 150, 0.2);
+    }
+
+    #searchInput::placeholder {
+      color: #9ca3af;
+      font-weight: 500;
+    }
+
+    /* ===============================
+       FOOTER - HIJAU TOSKA
+       =============================== */
+    .footer {
+      background-color: #329f96;
+      color: white;
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      flex-shrink: 0;
+      border-top: 2px solid #329f96;
+      box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .footer-time {
+      line-height: 1.5;
+    }
+
+    .footer-time .date {
+      font-weight: bold;
+      font-size: 15px;
+    }
+
+    .footer-time .time {
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .footer-brand-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .footer-brand-item span {
+      font-weight: bold;
+      font-size: 22px;
+      letter-spacing: -0.3px;
+    }
+
+    /* ===============================
+       LOADING SPINNER
+       =============================== */
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+      color: #6b7280;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #329f96;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin-right: 12px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* ===============================
+       RESPONSIVE
+       =============================== */
+    @media (max-width: 768px) {
+      .page-header {
+        padding: 8px 12px;
+        flex-direction: column;
+        gap: 6px;
+      }
+      
+      .page-header h1 {
+        font-size: 16px;
+        text-align: center;
+        width: 100%;
+      }
+
+      .buttons-container {
+        padding: 0 12px;
+        justify-content: center;
+      }
+
+      .btn {
+        width: 100%;
+        max-width: 300px;
+      }
+
+      .footer {
+        flex-direction: column;
+        gap: 12px;
+        padding: 16px 12px;
+        text-align: center;
+      }
+
+      .footer-brand {
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      thead th {
+        padding: 10px 12px;
+        font-size: 13px;
+      }
+
+      tbody td {
+        padding: 10px 12px;
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex flex-col">
+
+  <!-- HEADER - HIJAU TOSKA -->
+  <header class="page-header">
+    <img src="assets/images/zinus-putih.webp" alt="Logo Zinus" class="h-8" />
+    <h1 id="title">Detail Evaluasi Training 2</h1>
+  </header>
+
+  <!-- BUTTONS - KEMBALI & EXPORT -->
+  <div class="buttons-container">
+    <a href="evaluasi2.html" class="btn btn-back">
+      Kembali
+    </a>
+    <button id="exportBtn" class="btn btn-export">
+      Export Excel
+    </button>
+  </div>
+
+  <!-- MAIN -->
+  <main class="flex-1 p-4">
+    <div class="max-w-7xl mx-auto w-full">
+      <div class="card">
+
+        <!-- SEARCH BAR -->
+        <div class="search-container">
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Cari nama..."
+          />
+        </div>
+
+        <!-- TABLE -->
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Nama</th>
+                <th>Departemen</th>
+              </tr>
+            </thead>
+            <tbody id="table">
+              <tr>
+                <td colspan="3" class="loading">
+                  <div class="spinner"></div>
+                  <div>Memuat data...</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER - HIJAU TOSKA -->
+  <footer class="footer">
+    <div class="footer-time" id="clock">
+      <!-- Waktu akan di-inject di sini -->
+    </div>
+
+    <div class="footer-brand">
+      <div class="footer-brand-item">
+        <img src="assets/images/zinus-putih.webp" class="h-10" alt="Zinus Logo" />
+        <span>Zinus Dream Indonesia</span>
+      </div>
+      <img src="assets/images/hyundai-ori-hitam.png" class="h-10" alt="Hyundai Logo" />
+    </div>
+  </footer>
+
+  <!-- SCRIPT -->
+  <script src="assets/js/sheets.js"></script>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const dept = params.get('dept');
+
+    // Set title
+    document.getElementById('title').innerText = `Detail Evaluasi 2 - ${dept || 'Semua Departemen'}`;
+
+    let rawData = [];
+    let filteredData = [];
+
+    function renderTable(data) {
+      const table = document.getElementById('table');
+      table.innerHTML = '';
+
+      if (data.length === 0) {
+        table.innerHTML = `
+          <tr>
+            <td colspan="3" style="text-align: center; padding: 2.5rem; color: #6b7280;">
+              <div style="font-size: 16px; font-weight: 600;">
+                Tidak ada data
+              </div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      data.forEach(d => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${d.timestamp || '-'}</td>
+          <td>${escapeHtml(d.nama || '-')}</td>
+          <td>${escapeHtml(d.departemen || '-')}</td>
+        `;
+        table.appendChild(row);
+      });
+    }
+
+    // Export to Excel
+    function exportToExcel() {
+      const exportData = filteredData.map(item => ({
+        Timestamp: item.timestamp || '-',
+        Nama: item.nama || '-',
+        Departemen: item.departemen || '-'
+      }));
+
+      if (exportData.length === 0) {
+        alert('Tidak ada data untuk diekspor');
+        return;
+      }
+
+      exportToCSV(
+        `detail_evaluasi2_${dept || 'semua'}_${new Date().toISOString().slice(0, 10)}.csv`,
+        exportData
+      );
+    }
+
+    // Fetch data
+    fetchSheet('evaluasi2')
+      .then(data => {
+        console.log('✅ Data mentah:', data.length, 'baris');
+
+        // Filter berdasarkan departemen
+        let filteredByDept = data;
+        if (dept) {
+          filteredByDept = data.filter(d => d.departemen === dept);
+          console.log(`✅ Filter departemen "${dept}":`, filteredByDept.length, 'baris');
+        }
+
+        // Hapus duplikat nama
+        rawData = uniqueByName(filteredByDept);
+        console.log('✅ Setelah filter duplikat:', rawData.length, 'baris unik');
+
+        filteredData = [...rawData];
+        renderTable(filteredData);
+      })
+      .catch(error => {
+        console.error('❌ Error loading data:', error);
+        document.getElementById('table').innerHTML = `
+          <tr>
+            <td colspan="3" style="text-align: center; padding: 2.5rem; color: #dc2626;">
+              <div style="font-size: 18px; font-weight: bold; margin-bottom: 8px;">
+                Gagal Memuat Data
+              </div>
+              <div style="font-size: 14px; color: #6b7280;">
+                Silakan coba lagi nanti atau hubungi administrator
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+
+    // Search functionality
+    document.getElementById('searchInput').addEventListener('input', e => {
+      const keyword = e.target.value.toLowerCase().trim();
+
+      filteredData = rawData.filter(d => 
+        (d.nama && d.nama.toLowerCase().includes(keyword)) ||
+        (d.timestamp && d.timestamp.toLowerCase().includes(keyword)) ||
+        (d.departemen && d.departemen.toLowerCase().includes(keyword))
+      );
+
+      renderTable(filteredData);
+    });
+
+    // Export button
+    document.getElementById('exportBtn').addEventListener('click', exportToExcel);
+
+    // HTML escape function
+    function escapeHtml(text) {
+      if (!text) return '-';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // CLOCK
+    function updateClock() {
+      const now = new Date();
+      
+      const dateStr = now.toLocaleDateString("id-ID", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+      });
+      
+      const timeStr = now.toLocaleTimeString("id-ID", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      }) + " WIB";
+      
+      document.getElementById("clock").innerHTML = `
+        <div class="date">${dateStr}</div>
+        <div class="time">${timeStr}</div>
+      `;
+    }
+
+    setInterval(updateClock, 1000);
+    updateClock();
+  </script>
+
+</body>
+</html>
