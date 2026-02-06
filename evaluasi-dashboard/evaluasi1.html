@@ -483,13 +483,24 @@
       fetchSheet: typeof window.fetchSheet
     });
     
-    // Ensure sheets.js is loaded before executing
-    if (typeof window.getDepartmentSummary !== 'function' || typeof window.fetchSheet !== 'function') {
-      console.error('❌ sheets.js functions not loaded. Retrying in 500ms...');
-      setTimeout(() => location.reload(), 500);
+    // Wait for sheets.js functions to be available (polling, no reload)
+    function waitForSheets(timeout = 5000) {
+      return new Promise((resolve, reject) => {
+        const start = Date.now();
+        const iv = setInterval(() => {
+          if (typeof window.getDepartmentSummary === 'function' && typeof window.fetchSheet === 'function') {
+            clearInterval(iv);
+            resolve();
+          } else if (Date.now() - start > timeout) {
+            clearInterval(iv);
+            reject(new Error('sheets.js functions not available in time'));
+          }
+        }, 100);
+      });
     }
-    
-    window.fetchSheet("evaluasi1")
+
+    waitForSheets(5000)
+      .then(() => window.fetchSheet("evaluasi1"))
       .then(data => {
         console.log('📊 Data fetched:', data.length, 'rows');
         const summary = window.getDepartmentSummary(data); // ✅ DEDUP + FILTERED

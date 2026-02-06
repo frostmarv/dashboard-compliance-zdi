@@ -43,6 +43,72 @@
     }
 
     /* ===============================
+       BUTTONS CONTAINER
+       =============================== */
+    .buttons-container {
+      max-width: 7xl;
+      margin: 16px auto 0;
+      padding: 0 16px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* ===============================
+       BUTTONS
+       =============================== */
+    .btn {
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 14px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      border: 2px solid;
+      cursor: pointer;
+    }
+
+    .btn-back {
+      background-color: #329f96;
+      color: white;
+      border-color: #329f96;
+    }
+
+    .btn-back:hover {
+      background-color: white;
+      color: #329f96;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-back::before {
+      content: "← ";
+      margin-right: 6px;
+      font-weight: bold;
+    }
+
+    .btn-export {
+      background-color: #10b981;
+      color: white;
+      border-color: #10b981;
+    }
+
+    .btn-export:hover {
+      background-color: white;
+      color: #10b981;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-export::before {
+      content: "📥 ";
+      margin-right: 6px;
+    }
+
+    /* ===============================
        CARD / CONTAINER - PUTIH
        =============================== */
     .card {
@@ -62,7 +128,7 @@
       flex: 1;
       overflow-x: auto;
       overflow-y: auto;
-      max-height: calc(100vh - 260px);
+      max-height: calc(100vh - 300px);
       
       /* Sembunyikan scrollbar */
       -ms-overflow-style: none;
@@ -158,35 +224,6 @@
     }
 
     /* ===============================
-       BACK BUTTON
-       =============================== */
-    .back-button {
-      display: inline-block;
-      margin: 16px;
-      padding: 10px 20px;
-      background-color: #329f96;
-      color: white;
-      text-decoration: none;
-      border-radius: 6px;
-      font-weight: bold;
-      font-size: 14px;
-      transition: all 0.2s ease;
-      border: 2px solid #329f96;
-    }
-
-    .back-button:hover {
-      background-color: white;
-      color: #329f96;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .back-button::before {
-      content: "← ";
-      font-weight: bold;
-    }
-
-    /* ===============================
        FOOTER - HIJAU TOSKA
        =============================== */
     .footer {
@@ -235,6 +272,34 @@
     }
 
     /* ===============================
+       LOADING SPINNER
+       =============================== */
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+      color: #6b7280;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #329f96;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin-right: 12px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* ===============================
        RESPONSIVE
        =============================== */
     @media (max-width: 768px) {
@@ -248,6 +313,16 @@
         font-size: 16px;
         text-align: center;
         width: 100%;
+      }
+
+      .buttons-container {
+        padding: 0 12px;
+        justify-content: center;
+      }
+
+      .btn {
+        width: 100%;
+        max-width: 300px;
       }
 
       .footer {
@@ -271,12 +346,6 @@
         padding: 10px 12px;
         font-size: 13px;
       }
-
-      .back-button {
-        margin: 12px;
-        width: calc(100% - 24px);
-        text-align: center;
-      }
     }
   </style>
 </head>
@@ -288,6 +357,16 @@
     <img src="assets/images/zinus-putih.webp" alt="Logo Zinus" class="h-8" />
     <h1 id="title">Detail Evaluasi 1</h1>
   </header>
+
+  <!-- BUTTONS - KEMBALI & EXPORT -->
+  <div class="buttons-container">
+    <a href="evaluasi1.html" class="btn btn-back">
+      Kembali
+    </a>
+    <button id="exportBtn" class="btn btn-export">
+      Export Excel
+    </button>
+  </div>
 
   <!-- MAIN -->
   <main class="flex-1 p-4">
@@ -314,18 +393,18 @@
               </tr>
             </thead>
             <tbody id="table">
-              <!-- Data akan di-inject oleh JavaScript -->
+              <tr>
+                <td colspan="3" class="loading">
+                  <div class="spinner"></div>
+                  <div>Memuat data...</div>
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>
       </div>
     </div>
   </main>
-
-  <!-- BACK BUTTON -->
-  <a href="evaluasi1.html" class="back-button">
-    Kembali
-  </a>
 
   <!-- FOOTER - HIJAU TOSKA -->
   <footer class="footer">
@@ -352,6 +431,7 @@
     document.getElementById('title').innerText = `Detail Evaluasi 1 - ${dept || 'Semua Departemen'}`;
 
     let rawData = [];
+    let filteredData = [];
 
     function renderTable(data) {
       const table = document.getElementById('table');
@@ -381,19 +461,46 @@
       });
     }
 
+    // Export to Excel
+    function exportToExcel() {
+      const exportData = filteredData.map(item => ({
+        Timestamp: item.timestamp || '-',
+        Nama: item.nama || '-',
+        Departemen: item.departemen || '-'
+      }));
+
+      if (exportData.length === 0) {
+        alert('Tidak ada data untuk diekspor');
+        return;
+      }
+
+      exportToCSV(
+        `detail_evaluasi1_${dept || 'semua'}_${new Date().toISOString().slice(0, 10)}.csv`,
+        exportData
+      );
+    }
+
     // Fetch data
     fetchSheet('evaluasi1')
       .then(data => {
+        console.log('✅ Data mentah:', data.length, 'baris');
+
         // Filter berdasarkan departemen
+        let filteredByDept = data;
         if (dept) {
-          rawData = data.filter(d => d.departemen === dept);
-        } else {
-          rawData = data;
+          filteredByDept = data.filter(d => d.departemen === dept);
+          console.log(`✅ Filter departemen "${dept}":`, filteredByDept.length, 'baris');
         }
-        renderTable(rawData);
+
+        // Hapus duplikat nama
+        rawData = uniqueByName(filteredByDept);
+        console.log('✅ Setelah filter duplikat:', rawData.length, 'baris unik');
+
+        filteredData = [...rawData];
+        renderTable(filteredData);
       })
       .catch(error => {
-        console.error('Error loading data:', error);
+        console.error('❌ Error loading data:', error);
         document.getElementById('table').innerHTML = `
           <tr>
             <td colspan="3" style="text-align: center; padding: 2.5rem; color: #dc2626;">
@@ -412,13 +519,17 @@
     document.getElementById('searchInput').addEventListener('input', e => {
       const keyword = e.target.value.toLowerCase().trim();
 
-      const filtered = rawData.filter(d => 
+      filteredData = rawData.filter(d => 
         (d.nama && d.nama.toLowerCase().includes(keyword)) ||
-        (d.timestamp && d.timestamp.toLowerCase().includes(keyword))
+        (d.timestamp && d.timestamp.toLowerCase().includes(keyword)) ||
+        (d.departemen && d.departemen.toLowerCase().includes(keyword))
       );
 
-      renderTable(filtered);
+      renderTable(filteredData);
     });
+
+    // Export button
+    document.getElementById('exportBtn').addEventListener('click', exportToExcel);
 
     // HTML escape function
     function escapeHtml(text) {
