@@ -4,7 +4,7 @@
 
   // Google Sheets URLs
   const SHEETS = {
-    evaluasi1: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT6w6f01zKeCm8Xzx2nFGk1qGXVQbeOTHK8G6MoJLrjhM-XfGjgYE-Vq2eKMtOh6VboifRXZvSrW0R_/pub?gid=1248578848&single=true&output=csv'
+    evaluasi1: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT6w6f01zKeCm8Xzx2nFGk1qGXVQbeOTHK8G6MoJLrjhM-XfGjgYE-Vq2eKMtOh6VboifRXZvSrW0R_/pub?output=csv'
   };
 
   // Parse CSV

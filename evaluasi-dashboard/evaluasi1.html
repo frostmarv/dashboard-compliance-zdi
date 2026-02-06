@@ -478,12 +478,21 @@
   <script>
     // 🔥 HANYA GUNAKAN FUNGSI DARI sheets.js — TIDAK ADA LOGIC DI SINI
     console.log('📊 Starting evaluasi1.html script...');
-    console.log('📊 Is getDepartmentSummary defined?', typeof getDepartmentSummary);
+    console.log('📊 Window functions check:', {
+      getDepartmentSummary: typeof window.getDepartmentSummary,
+      fetchSheet: typeof window.fetchSheet
+    });
     
-    fetchSheet("evaluasi1")
+    // Ensure sheets.js is loaded before executing
+    if (typeof window.getDepartmentSummary !== 'function' || typeof window.fetchSheet !== 'function') {
+      console.error('❌ sheets.js functions not loaded. Retrying in 500ms...');
+      setTimeout(() => location.reload(), 500);
+    }
+    
+    window.fetchSheet("evaluasi1")
       .then(data => {
         console.log('📊 Data fetched:', data.length, 'rows');
-        const summary = getDepartmentSummary(data); // ✅ DEDUP + FILTERED
+        const summary = window.getDepartmentSummary(data); // ✅ DEDUP + FILTERED
         const table = document.getElementById("table");
         table.innerHTML = '';
 
