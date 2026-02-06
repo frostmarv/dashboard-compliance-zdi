@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Double Input - Evaluasi 1</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ===============================
+       GLOBAL THEME
+       =============================== */
+    body {
+      background-color: #e9fbf0;
+      font-family: 'Inter', Arial, sans-serif;
+      color: #333;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+
+    /* ===============================
+       HEADER - HIJAU TOSKA
+       =============================== */
+    .page-header {
+      background-color: #329f96;
+      color: white;
+      border-bottom: 2px solid #329f96;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .page-header h1 {
+      font-size: 18px;
+      font-weight: bold;
+      margin: 0;
+      letter-spacing: 0.5px;
+      flex: 1;
+    }
+
+    /* ===============================
+       TOMBOL KEMBALI - SEJAJAR DENGAN CARD
+       =============================== */
+    .btn-back-between {
+      background-color: white;
+      color: #329f96;
+      border: 2px solid #329f96;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: bold;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+      font-size: 14px;
+      white-space: nowrap;
+      max-width: 200px;
+      justify-content: center;
+      margin: 12px auto 0;
+    }
+
+    .btn-back-between:hover {
+      background-color: #329f96;
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(50, 159, 150, 0.3);
+    }
+
+    .btn-back-between svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* ===============================
+       CARD / CONTAINER - PUTIH
+       =============================== */
+    .card {
+      background-color: white;
+      border: 2px solid #329f96;
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    /* ===============================
+       SLIDE HEADER - HIJAU TOSKA
+       =============================== */
+    .slide-header {
+      background-color: #329f96;
+      color: white;
+      padding: 12px 16px;
+      font-weight: bold;
+      font-size: 18px;
+      text-align: center;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+      flex-shrink: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* ===============================
+       TABLE CONTAINER
+       =============================== */
+    .table-container {
+      flex: 1;
+      overflow-x: auto;
+      overflow-y: auto;
+      max-height: calc(100vh - 320px);
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .table-container::-webkit-scrollbar {
+      display: none;
+    }
+
+    table {
+      width: 100%;
+      min-width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    thead {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    thead th {
+      background-color: #329f96;
+      color: white;
+      padding: 12px 16px;
+      text-align: left;
+      font-weight: bold;
+      font-size: 14px;
+      white-space: nowrap;
+      border-bottom: 2px solid #329f96;
+    }
+
+    thead th:nth-child(2),
+    thead th:nth-child(3),
+    thead th:nth-child(4) {
+      text-align: center;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+
+    tbody tr:hover {
+      background-color: #f0f8ff;
+    }
+
+    tbody td {
+      padding: 12px 16px;
+      white-space: nowrap;
+      font-weight: 600;
+    }
+
+    tbody td:first-child {
+      text-align: left;
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+
+    tbody td:nth-child(2),
+    tbody td:nth-child(3),
+    tbody td:nth-child(4) {
+      text-align: center;
+    }
+
+    /* ===============================
+       BADGE DETAIL - MERAH (WARNING)
+       =============================== */
+    .badge-detail {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background-color: #ef4444;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: bold;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      font-size: 14px;
+      border: 2px solid #ef4444;
+      white-space: nowrap;
+    }
+
+    .badge-detail:hover {
+      background-color: white;
+      color: #ef4444;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
+    }
+
+    .badge-detail svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    /* ===============================
+       FOOTER - HIJAU TOSKA
+       =============================== */
+    .footer {
+      background-color: #329f96;
+      color: white;
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      flex-shrink: 0;
+      border-top: 2px solid #329f96;
+      box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .footer-time {
+      line-height: 1.5;
+    }
+
+    .footer-time .date {
+      font-weight: bold;
+      font-size: 15px;
+    }
+
+    .footer-time .time {
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .footer-brand-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .footer-brand-item span {
+      font-weight: bold;
+      font-size: 22px;
+      letter-spacing: -0.3px;
+    }
+
+    /* ===============================
+       LOADING STATE
+       =============================== */
+    .loading {
+      text-align: center;
+      padding: 2.5rem;
+      color: #6b7280;
+    }
+
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #329f96;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ===============================
+       RESPONSIVE - MOBILE OPTIMIZED
+       =============================== */
+    @media (max-width: 768px) {
+      .page-header {
+        padding: 10px 12px;
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .page-header h1 {
+        font-size: 16px;
+        text-align: center;
+        width: 100%;
+        margin-top: 4px;
+      }
+
+      .btn-back-between {
+        width: 100%;
+        justify-content: center;
+        font-size: 15px;
+        padding: 10px 16px;
+        margin: 10px auto 0;
+      }
+
+      .card {
+        border-radius: 12px;
+        margin: 0 8px;
+      }
+
+      .slide-header {
+        padding: 12px;
+        font-size: 16px;
+      }
+
+      .table-container {
+        max-height: calc(100vh - 400px);
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      table {
+        min-width: 480px;
+      }
+
+      thead th {
+        padding: 10px 12px;
+        font-size: 13px;
+      }
+
+      tbody td {
+        padding: 10px 12px;
+        font-size: 13px;
+      }
+
+      .badge-detail {
+        padding: 6px 12px;
+        font-size: 13px;
+      }
+
+      .footer {
+        flex-direction: column;
+        gap: 12px;
+        padding: 16px 12px;
+        text-align: center;
+      }
+
+      .footer-brand {
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .footer-time .date,
+      .footer-time .time {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex flex-col">
+
+  <!-- HEADER -->
+  <header class="page-header">
+    <img src="assets/images/zinus-putih.webp" alt="Logo Zinus" class="h-8" />
+    <h1>Double Input - Evaluasi 1</h1>
+  </header>
+
+  <!-- MAIN -->
+  <main class="flex-1 p-4">
+    <div class="max-w-7xl mx-auto w-full">
+      <!-- TOMBOL KEMBALI -->
+      <a href="index.html" class="btn-back-between" aria-label="Kembali ke Beranda">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Kembali ke Beranda
+      </a>
+
+      <!-- CARD -->
+      <div class="card mt-4">
+        <div class="slide-header">
+          📊 Rekap Double Input per Departemen
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Departemen</th>
+                <th>Jumlah Double</th>
+                <th>Orang Terdampak</th>
+                <th>Detail</th>
+              </tr>
+            </thead>
+            <tbody id="table">
+              <tr>
+                <td colspan="4" class="loading">
+                  <div class="loading-spinner"></div>
+                  <div>Memuat data...</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-time" id="clock"></div>
+    <div class="footer-brand">
+      <div class="footer-brand-item">
+        <img src="assets/images/zinus-putih.webp" class="h-10" alt="Zinus Logo" />
+        <span>Zinus Dream Indonesia</span>
+      </div>
+      <img src="assets/images/hyundai-ori-hitam.png" class="h-10" alt="Hyundai Logo" />
+    </div>
+  </footer>
+
+  <!-- SCRIPT -->
+  <script src="assets/js/sheets.js"></script>
+  <script>
+    console.log('📊 Starting double-evaluasi1.html script...');
+    
+    // Wait for sheets.js functions
+    function waitForSheets(timeout = 5000) {
+      return new Promise((resolve, reject) => {
+        const start = Date.now();
+        const iv = setInterval(() => {
+          if (typeof window.findDuplicateNames === 'function' && 
+              typeof window.fetchSheet === 'function') {
+            clearInterval(iv);
+            resolve();
+          } else if (Date.now() - start > timeout) {
+            clearInterval(iv);
+            reject(new Error('sheets.js functions not available'));
+          }
+        }, 100);
+      });
+    }
+
+    // Group double input by department
+    function groupDoubleByDepartment(data) {
+      const map = {};
+      for (const item of data) {
+        const dept = item.departemen;
+        if (!map[dept]) map[dept] = [];
+        map[dept].push(item);
+      }
+      return map;
+    }
+
+    // Count unique names with duplicates
+    function countUniqueDoubleNames(data) {
+      const nameMap = {};
+      for (const item of data) {
+        const key = item.nama.trim().toLowerCase();
+        if (!nameMap[key]) {
+          nameMap[key] = { count: 0, names: [] };
+        }
+        nameMap[key].count++;
+        if (!nameMap[key].names.includes(item.nama)) {
+          nameMap[key].names.push(item.nama);
+        }
+      }
+      return Object.values(nameMap).filter(v => v.count > 1).length;
+    }
+
+    // Fetch and display data
+    waitForSheets(5000)
+      .then(() => window.fetchSheet("evaluasi1"))
+      .then(data => {
+        console.log('📊 Data fetched:', data.length, 'rows');
+        
+        // Find duplicates (NO FILTER!)
+        const doubles = window.findDuplicateNames(data);
+        console.log('⚠️ Found', doubles.length, 'duplicate entries');
+        
+        if (doubles.length === 0) {
+          document.getElementById("table").innerHTML = `
+            <tr>
+              <td colspan="4" style="text-align: center; padding: 2.5rem; color: #10b981;">
+                <div style="font-size: 18px; font-weight: bold; margin-bottom: 8px;">
+                  <i class="fas fa-check-circle" style="margin-right: 8px;"></i>Tidak Ada Double Input
+                </div>
+                <div style="font-size: 14px; color: #6b7280;">
+                  Semua data sudah valid
+                </div>
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        // Group by department
+        const grouped = groupDoubleByDepartment(doubles);
+        
+        // Render table
+        const table = document.getElementById("table");
+        table.innerHTML = '';
+
+        Object.entries(grouped).forEach(([dept, items]) => {
+          const uniqueCount = countUniqueDoubleNames(items);
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${escapeHtml(dept)}</td>
+            <td>
+              <span style="background-color: #fef3c7; color: #92400e; padding: 4px 8px; border-radius: 4px; font-weight: bold;">
+                ${items.length}x
+              </span>
+            </td>
+            <td>
+              <span style="background-color: #fee2e2; color: #b91c1c; padding: 4px 8px; border-radius: 4px; font-weight: bold;">
+                ${uniqueCount} orang
+              </span>
+            </td>
+            <td>
+              <a href="detail-double-evaluasi1.html?dept=${encodeURIComponent(dept)}" class="badge-detail">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+                Lihat Detail
+              </a>
+            </td>
+          `;
+          table.appendChild(row);
+        });
+      })
+      .catch(error => {
+        console.error('❌ Error loading data:', error);
+        document.getElementById("table").innerHTML = `
+          <tr>
+            <td colspan="4" style="text-align: center; padding: 2.5rem; color: #dc2626;">
+              <div style="font-size: 18px; font-weight: bold; margin-bottom: 8px;">Gagal Memuat Data</div>
+              <div style="font-size: 14px; color: #6b7280;">Silakan coba lagi nanti</div>
+            </td>
+          </tr>
+        `;
+      });
+
+    // HTML escape function
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // CLOCK
+    function updateClock() {
+      const now = new Date();
+      const dateStr = now.toLocaleDateString("id-ID", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+      });
+      const timeStr = now.toLocaleTimeString("id-ID", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      }) + " WIB";
+      document.getElementById("clock").innerHTML = `
+        <div class="date">${dateStr}</div>
+        <div class="time">${timeStr}</div>
+      `;
+    }
+
+    setInterval(updateClock, 1000);
+    updateClock();
+  </script>
+
+</body>
+</html>

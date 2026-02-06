@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard - Evaluasi Training</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    /* ===============================
+       GLOBAL THEME
+       =============================== */
+    body {
+      background-color: #e9fbf0;
+      font-family: 'Inter', Arial, sans-serif;
+      color: #333;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+
+    /* ===============================
+       HEADER - HIJAU TOSKA
+       =============================== */
+    .page-header {
+      background-color: #329f96;
+      color: white;
+      border-bottom: 2px solid #329f96;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .page-header h1 {
+      font-size: 18px;
+      font-weight: bold;
+      margin: 0;
+      letter-spacing: 0.5px;
+      flex: 1;
+      text-align: center;
+    }
+
+    /* ===============================
+       CARD / CONTAINER - PUTIH
+       =============================== */
+    .card {
+      background-color: white;
+      border: 2px solid #329f96;
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-header {
+      background-color: #329f96;
+      color: white;
+      padding: 16px;
+      font-weight: bold;
+      font-size: 16px;
+      border-bottom: 2px solid #329f96;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* ===============================
+       SUMMARY CARDS
+       =============================== */
+    .summary-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .summary-card {
+      background: linear-gradient(135deg, #329f96 0%, #10b981 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .summary-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .summary-card.secondary {
+      background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+    }
+
+    .summary-card.tertiary {
+      background: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%);
+    }
+
+    .summary-card.quaternary {
+      background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+    }
+
+    .summary-card-icon {
+      font-size: 36px;
+      opacity: 0.95;
+    }
+
+    .summary-card-title {
+      font-size: 14px;
+      font-weight: 600;
+      opacity: 0.95;
+    }
+
+    .summary-card-value {
+      font-size: 32px;
+      font-weight: bold;
+      margin-top: 4px;
+    }
+
+    .summary-card-subtitle {
+      font-size: 12px;
+      opacity: 0.85;
+      margin-top: 2px;
+    }
+
+    /* ===============================
+       TABS / SLIDES
+       =============================== */
+    .tabs-container {
+      margin-bottom: 24px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .tab-btn {
+      padding: 12px 24px;
+      border: 2px solid #329f96;
+      background-color: white;
+      color: #329f96;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      flex: 1;
+      min-width: 120px;
+      text-align: center;
+    }
+
+    .tab-btn.active {
+      background-color: #329f96;
+      color: white;
+    }
+
+    .tab-btn:hover:not(.active) {
+      background-color: #f0f9ff;
+      transform: translateY(-2px);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* ===============================
+       CHART CONTAINER
+       =============================== */
+    .chart-container {
+      position: relative;
+      height: 350px;
+      width: 100%;
+      padding: 16px;
+    }
+
+    .chart-wrapper {
+      background-color: white;
+      border: 2px solid #329f96;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .chart-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #329f96;
+      margin-bottom: 16px;
+      text-align: center;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #f0f9ff;
+    }
+
+    /* ===============================
+       COMPARISON GRID
+       =============================== */
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    /* ===============================
+       TABLE CONTAINER
+       =============================== */
+    .table-container {
+      flex: 1;
+      overflow-x: auto;
+      overflow-y: auto;
+      max-height: 400px;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .table-container::-webkit-scrollbar {
+      display: none;
+    }
+
+    table {
+      width: 100%;
+      min-width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    thead {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    thead th {
+      background-color: #329f96;
+      color: white;
+      padding: 14px 16px;
+      text-align: left;
+      font-weight: bold;
+      font-size: 14px;
+      white-space: nowrap;
+      border-bottom: 2px solid #329f96;
+    }
+
+    thead th:nth-child(2),
+    thead th:nth-child(3),
+    thead th:nth-child(4) {
+      text-align: center;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+
+    tbody tr:hover {
+      background-color: #f0f8ff;
+    }
+
+    tbody td {
+      padding: 12px 16px;
+      white-space: nowrap;
+      font-weight: 600;
+    }
+
+    tbody td:first-child {
+      text-align: left;
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+
+    tbody td:nth-child(2),
+    tbody td:nth-child(3),
+    tbody td:nth-child(4) {
+      text-align: center;
+    }
+
+    /* ===============================
+       BADGE DETAIL - HIJAU TOSKA
+       =============================== */
+    .badge-detail {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background-color: #329f96;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: bold;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      font-size: 14px;
+      border: 2px solid #329f96;
+      white-space: nowrap;
+    }
+
+    .badge-detail:hover {
+      background-color: white;
+      color: #329f96;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(50, 159, 150, 0.3);
+    }
+
+    .badge-detail i {
+      font-size: 16px;
+    }
+
+    /* ===============================
+       FOOTER - HIJAU TOSKA
+       =============================== */
+    .footer {
+      background-color: #329f96;
+      color: white;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      flex-shrink: 0;
+      border-top: 2px solid #329f96;
+      box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .footer-time {
+      line-height: 1.5;
+    }
+
+    .footer-time .date {
+      font-weight: bold;
+      font-size: 15px;
+    }
+
+    .footer-time .time {
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .footer-brand-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .footer-brand-item span {
+      font-weight: bold;
+      font-size: 22px;
+      letter-spacing: -0.3px;
+    }
+
+    .footer-copyright {
+      text-align: center;
+      padding: 12px 0;
+      background-color: rgba(0, 0, 0, 0.1);
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    /* ===============================
+       LOADING STATE
+       =============================== */
+    .loading {
+      text-align: center;
+      padding: 2.5rem;
+      color: #6b7280;
+    }
+
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid #329f96;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ===============================
+       RESPONSIVE - MOBILE OPTIMIZED
+       =============================== */
+    @media (max-width: 1024px) {
+      .comparison-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .page-header {
+        padding: 12px;
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .page-header h1 {
+        font-size: 16px;
+        text-align: center;
+        width: 100%;
+        margin-top: 4px;
+      }
+
+      .summary-cards {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+
+      .summary-card {
+        padding: 16px;
+        border-radius: 10px;
+      }
+
+      .summary-card-icon {
+        font-size: 28px;
+      }
+
+      .summary-card-title {
+        font-size: 12px;
+      }
+
+      .summary-card-value {
+        font-size: 24px;
+      }
+
+      .tabs {
+        flex-direction: column;
+      }
+
+      .tab-btn {
+        width: 100%;
+        padding: 10px;
+        font-size: 14px;
+      }
+
+      .chart-container {
+        height: 280px;
+        padding: 12px;
+      }
+
+      .chart-wrapper {
+        padding: 16px;
+      }
+
+      .chart-title {
+        font-size: 16px;
+        padding-bottom: 8px;
+      }
+
+      thead th {
+        padding: 10px 12px;
+        font-size: 12px;
+      }
+
+      tbody td {
+        padding: 10px 12px;
+        font-size: 13px;
+      }
+
+      .badge-detail {
+        padding: 8px 16px;
+        font-size: 13px;
+      }
+
+      .footer {
+        flex-direction: column;
+        gap: 12px;
+        padding: 16px 12px;
+        text-align: center;
+      }
+
+      .footer-brand {
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .footer-time .date,
+      .footer-time .time {
+        font-size: 14px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .page-header {
+        padding: 10px 8px;
+      }
+
+      .page-header h1 {
+        font-size: 15px;
+      }
+
+      .summary-cards {
+        grid-template-columns: 1fr;
+      }
+
+      .summary-card {
+        padding: 14px;
+      }
+
+      .summary-card-icon {
+        font-size: 24px;
+      }
+
+      .summary-card-title {
+        font-size: 11px;
+      }
+
+      .summary-card-value {
+        font-size: 20px;
+      }
+
+      .summary-card-subtitle {
+        font-size: 10px;
+      }
+
+      .chart-container {
+        height: 220px;
+      }
+
+      thead th,
+      tbody td {
+        padding: 8px 10px;
+        font-size: 11px;
+      }
+
+      .badge-detail {
+        width: 100%;
+        justify-content: center;
+        font-size: 12px;
+        padding: 8px;
+      }
+
+      .footer {
+        padding: 12px 8px;
+      }
+
+      .footer-brand-item span {
+        font-size: 18px;
+      }
+
+      .footer-copyright {
+        font-size: 11px;
+        padding: 8px 0;
+      }
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex flex-col">
+
+  <!-- HEADER -->
+  <header class="page-header">
+    <img src="assets/images/zinus-putih.webp" alt="Logo Zinus" class="h-8" />
+    <h1>Dashboard - Evaluasi Training</h1>
+  </header>
+
+  <!-- MAIN -->
+  <main class="flex-1 p-4">
+    <div class="max-w-7xl mx-auto w-full">
+      
+      <!-- LOADING STATE -->
+      <div id="loadingOverlay" class="fixed inset-0 bg-white bg-opacity-95 z-50 flex items-center justify-center">
+        <div class="text-center">
+          <div class="loading-spinner"></div>
+          <div class="text-lg font-bold text-gray-700 mt-4">Memuat data...</div>
+        </div>
+      </div>
+
+      <!-- SUMMARY CARDS -->
+      <div class="summary-cards">
+        <div class="summary-card">
+          <div class="summary-card-icon">
+            <i class="fas fa-users"></i>
+          </div>
+          <div class="summary-card-title">Total Peserta Evaluasi 1</div>
+          <div class="summary-card-value" id="totalEvaluasi1">0</div>
+          <div class="summary-card-subtitle">Orang</div>
+        </div>
+
+        <div class="summary-card secondary">
+          <div class="summary-card-icon">
+            <i class="fas fa-graduation-cap"></i>
+          </div>
+          <div class="summary-card-title">Total Peserta Evaluasi 2</div>
+          <div class="summary-card-value" id="totalEvaluasi2">0</div>
+          <div class="summary-card-subtitle">Orang</div>
+        </div>
+
+        <div class="summary-card tertiary">
+          <div class="summary-card-icon">
+            <i class="fas fa-building"></i>
+          </div>
+          <div class="summary-card-title">Total Departemen</div>
+          <div class="summary-card-value" id="totalDepartemen">0</div>
+          <div class="summary-card-subtitle">Departemen</div>
+        </div>
+
+        <div class="summary-card quaternary">
+          <div class="summary-card-icon">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <div class="summary-card-title">Rata-rata per Departemen</div>
+          <div class="summary-card-value" id="rataRata">0</div>
+          <div class="summary-card-subtitle">Orang</div>
+        </div>
+      </div>
+
+      <!-- COMPARISON CHARTS -->
+      <div class="comparison-grid">
+        <!-- Chart Evaluasi 1 vs Evaluasi 2 -->
+        <div class="chart-wrapper">
+          <div class="chart-title">📊 Perbandingan Total Peserta</div>
+          <div class="chart-container">
+            <canvas id="comparisonChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart Per Departemen dengan Tabs -->
+        <div class="chart-wrapper">
+          <div class="card-header">
+            <span>👥 Peserta per Departemen</span>
+            <div class="tabs">
+              <button class="tab-btn active" data-tab="evaluasi1">Evaluasi 1</button>
+              <button class="tab-btn" data-tab="evaluasi2">Evaluasi 2</button>
+            </div>
+          </div>
+          <div class="chart-container">
+            <div class="tab-content active" id="tab-evaluasi1">
+              <canvas id="departmentChart1"></canvas>
+            </div>
+            <div class="tab-content" id="tab-evaluasi2">
+              <canvas id="departmentChart2"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TABLE COMPARISON -->
+      <div class="card">
+        <div class="card-header">
+          📋 Rekapitulasi Per Departemen
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Departemen</th>
+                <th>Evaluasi 1</th>
+                <th>Evaluasi 2</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody id="comparisonTable">
+              <tr>
+                <td colspan="4" class="loading">
+                  <div class="loading-spinner"></div>
+                  <div>Memuat data...</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ACTION BUTTONS -->
+      <div class="mt-6 flex gap-4 justify-center flex-wrap">
+        <a href="evaluasi1.html" class="badge-detail">
+          <i class="fas fa-eye"></i> Lihat Detail Evaluasi 1
+        </a>
+        <a href="evaluasi2.html" class="badge-detail">
+          <i class="fas fa-eye"></i> Lihat Detail Evaluasi 2
+        </a>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-time" id="clock"></div>
+    <div class="footer-brand">
+      <div class="footer-brand-item">
+        <img src="assets/images/zinus-putih.webp" class="h-10" alt="Zinus Logo" />
+        <span>Zinus Dream Indonesia</span>
+      </div>
+      <img src="assets/images/hyundai-ori-hitam.png" class="h-10" alt="Hyundai Logo" />
+    </div>
+  </footer>
+
+  <!-- COPYRIGHT -->
+  <div class="footer-copyright">
+    © 2025 Compliance Team | Zinus Indonesia
+  </div>
+
+  <!-- SCRIPT -->
+  <script src="assets/js/sheets.js"></script>
+  <script>
+    // Global variables
+    let evaluasi1Data = [];
+    let evaluasi2Data = [];
+    let charts = {};
+
+    // Wait for sheets.js functions to be available
+    function waitForSheets(timeout = 5000) {
+      return new Promise((resolve, reject) => {
+        const start = Date.now();
+        const iv = setInterval(() => {
+          if (typeof window.getDepartmentSummary === 'function' && 
+              typeof window.fetchSheet === 'function' &&
+              typeof window.uniqueByName === 'function') {
+            clearInterval(iv);
+            resolve();
+          } else if (Date.now() - start > timeout) {
+            clearInterval(iv);
+            reject(new Error('sheets.js functions not available in time'));
+          }
+        }, 100);
+      });
+    }
+
+    // Tab switching
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const tabName = this.getAttribute('data-tab');
+        
+        // Remove active from all
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        
+        // Add active to current
+        this.classList.add('active');
+        document.getElementById(`tab-${tabName}`).classList.add('active');
+      });
+    });
+
+    // Fetch and process data
+    async function loadData() {
+      try {
+        // Fetch data
+        const [data1, data2] = await Promise.all([
+          window.fetchSheet('evaluasi1'),
+          window.fetchSheet('evaluasi2')
+        ]);
+
+        evaluasi1Data = data1;
+        evaluasi2Data = data2;
+
+        console.log('✅ Data loaded:', {
+          evaluasi1: data1.length,
+          evaluasi2: data2.length
+        });
+
+        // Process summaries
+        const summary1 = window.getDepartmentSummary(data1);
+        const summary2 = window.getDepartmentSummary(data2);
+
+        // Calculate totals
+        const total1 = summary1.reduce((sum, item) => sum + item.jumlah, 0);
+        const total2 = summary2.reduce((sum, item) => sum + item.jumlah, 0);
+        const allDepartments = new Set([
+          ...summary1.map(s => s.departemen),
+          ...summary2.map(s => s.departemen)
+        ]);
+        const avgPerDept = allDepartments.size > 0 ? Math.round((total1 + total2) / allDepartments.size) : 0;
+
+        // Update summary cards
+        document.getElementById('totalEvaluasi1').textContent = total1;
+        document.getElementById('totalEvaluasi2').textContent = total2;
+        document.getElementById('totalDepartemen').textContent = allDepartments.size;
+        document.getElementById('rataRata').textContent = avgPerDept;
+
+        // Create charts
+        createComparisonChart(summary1, summary2);
+        createDepartmentChart(summary1, 'departmentChart1');
+        createDepartmentChart(summary2, 'departmentChart2');
+
+        // Create comparison table
+        createComparisonTable(summary1, summary2);
+
+        // Hide loading
+        document.getElementById('loadingOverlay').style.display = 'none';
+
+      } catch (error) {
+        console.error('❌ Error loading data:', error);
+        document.getElementById('loadingOverlay').innerHTML = `
+          <div class="text-center text-red-600">
+            <i class="fas fa-exclamation-triangle text-5xl mb-4"></i>
+            <div class="text-lg font-bold">Gagal Memuat Data</div>
+            <div class="text-sm mt-2">Silakan refresh halaman</div>
+          </div>
+        `;
+      }
+    }
+
+    // Create comparison chart
+    function createComparisonChart(summary1, summary2) {
+      const ctx = document.getElementById('comparisonChart').getContext('2d');
+      
+      // Get totals
+      const total1 = summary1.reduce((sum, item) => sum + item.jumlah, 0);
+      const total2 = summary2.reduce((sum, item) => sum + item.jumlah, 0);
+
+      if (charts.comparison) {
+        charts.comparison.destroy();
+      }
+
+      charts.comparison = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Evaluasi 1', 'Evaluasi 2'],
+          datasets: [{
+            label: 'Jumlah Peserta',
+            data: [total1, total2],
+            backgroundColor: ['#329f96', '#10b981'],
+            borderColor: ['#2a8a7f', '#0da274'],
+            borderWidth: 2,
+            borderRadius: 8,
+            hoverBackgroundColor: ['#2a8a7f', '#0da274']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              backgroundColor: 'rgba(50, 159, 150, 0.9)',
+              titleColor: '#ffffff',
+              bodyColor: '#ffffff',
+              borderColor: '#ffffff',
+              borderWidth: 1,
+              callbacks: {
+                label: function(context) {
+                  return `Jumlah: ${context.raw} orang`;
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                stepSize: 5
+              },
+              grid: {
+                color: 'rgba(0, 0, 0, 0.05)'
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Create department chart
+    function createDepartmentChart(summary, chartId) {
+      const ctx = document.getElementById(chartId).getContext('2d');
+      
+      const labels = summary.map(item => item.departemen);
+      const data = summary.map(item => item.jumlah);
+
+      const chartName = chartId === 'departmentChart1' ? 'department1' : 'department2';
+      
+      if (charts[chartName]) {
+        charts[chartName].destroy();
+      }
+
+      charts[chartName] = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: data,
+            backgroundColor: [
+              '#329f96', '#10b981', '#0ea5e9', '#8b5cf6', 
+              '#f59e0b', '#ef4444', '#ec4899', '#14b8a6',
+              '#6366f1', '#22d3ee', '#10b981', '#fbbf24'
+            ],
+            borderWidth: 2,
+            borderColor: '#ffffff',
+            hoverOffset: 10
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'right',
+              labels: {
+                font: {
+                  size: 11,
+                  family: "'Inter', Arial, sans-serif"
+                },
+                padding: 12,
+                color: '#333'
+              }
+            },
+            tooltip: {
+              backgroundColor: 'rgba(50, 159, 150, 0.9)',
+              titleColor: '#ffffff',
+              bodyColor: '#ffffff',
+              borderColor: '#ffffff',
+              borderWidth: 1,
+              callbacks: {
+                label: function(context) {
+                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                  const percentage = ((context.raw / total) * 100).toFixed(1);
+                  return `${context.label}: ${context.raw} orang (${percentage}%)`;
+                }
+              }
+            }
+          },
+          cutout: '60%'
+        }
+      });
+    }
+
+    // Create comparison table
+    function createComparisonTable(summary1, summary2) {
+      const tableBody = document.getElementById('comparisonTable');
+      tableBody.innerHTML = '';
+
+      // Create map for easy lookup
+      const map1 = new Map(summary1.map(item => [item.departemen, item.jumlah]));
+      const map2 = new Map(summary2.map(item => [item.departemen, item.jumlah]));
+
+      // Get all unique departments
+      const allDepts = new Set([
+        ...summary1.map(s => s.departemen),
+        ...summary2.map(s => s.departemen)
+      ]);
+
+      // Sort by total descending
+      const sortedDepts = Array.from(allDepts).sort((a, b) => {
+        const totalA = (map1.get(a) || 0) + (map2.get(a) || 0);
+        const totalB = (map1.get(b) || 0) + (map2.get(b) || 0);
+        return totalB - totalA;
+      });
+
+      if (sortedDepts.length === 0) {
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="4" style="text-align: center; padding: 2.5rem; color: #6b7280;">
+              <div style="font-size: 16px; font-weight: 600;">
+                Tidak ada data
+              </div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      sortedDepts.forEach(dept => {
+        const count1 = map1.get(dept) || 0;
+        const count2 = map2.get(dept) || 0;
+        const total = count1 + count2;
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${escapeHtml(dept)}</td>
+          <td>
+            ${count1 > 0 ? `<span style="color: #329f96; font-weight: bold;">${count1} orang</span>` : '-'}
+          </td>
+          <td>
+            ${count2 > 0 ? `<span style="color: #10b981; font-weight: bold;">${count2} orang</span>` : '-'}
+          </td>
+          <td>
+            <strong style="color: #0ea5e9;">${total} orang</strong>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+
+    // HTML escape function
+    function escapeHtml(text) {
+      if (!text) return '-';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // CLOCK
+    function updateClock() {
+      const now = new Date();
+      const dateStr = now.toLocaleDateString("id-ID", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+      });
+      const timeStr = now.toLocaleTimeString("id-ID", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      }) + " WIB";
+      document.getElementById("clock").innerHTML = `
+        <div class="date">${dateStr}</div>
+        <div class="time">${timeStr}</div>
+      `;
+    }
+
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Initialize
+    waitForSheets(5000)
+      .then(loadData)
+      .catch(error => {
+        console.error('Failed to initialize:', error);
+        document.getElementById('loadingOverlay').innerHTML = `
+          <div class="text-center text-red-600">
+            <i class="fas fa-exclamation-triangle text-5xl mb-4"></i>
+            <div class="text-lg font-bold">Error</div>
+            <div class="text-sm mt-2">${error.message}</div>
+          </div>
+        `;
+      });
+
+    // Cleanup on unload
+    window.addEventListener('beforeunload', () => {
+      Object.values(charts).forEach(chart => {
+        if (chart && chart.destroy) chart.destroy();
+      });
+    });
+
+    // Mobile detection
+    function isMobileDevice() {
+      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+             (window.innerWidth <= 768);
+    }
+
+    if (isMobileDevice()) {
+      document.body.classList.add('mobile-optimized');
+    }
+  </script>
+
+</body>
+</html>
