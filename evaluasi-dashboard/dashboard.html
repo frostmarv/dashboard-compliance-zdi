@@ -582,7 +582,7 @@
 
   <!-- HEADER -->
   <header class="page-header">
-    <img src="assets/images/zinus-putih.webp" alt="Logo Zinus" class="h-8" />
+    <img src="assets/images/zinus-putih.webp" alt="Logo Zinus" class="h-8" onerror="this.style.display='none'" />
     <h1>Dashboard - Evaluasi Training</h1>
   </header>
 
@@ -604,17 +604,17 @@
           <div class="summary-card-icon">
             <i class="fas fa-users"></i>
           </div>
-          <div class="summary-card-title">Total Peserta Evaluasi 1</div>
-          <div class="summary-card-value" id="totalEvaluasi1">0</div>
+          <div class="summary-card-title">Total Karyawan (Database)</div>
+          <div class="summary-card-value" id="totalKaryawan">0</div>
           <div class="summary-card-subtitle">Orang</div>
         </div>
 
         <div class="summary-card secondary">
           <div class="summary-card-icon">
-            <i class="fas fa-graduation-cap"></i>
+            <i class="fas fa-clipboard-check"></i>
           </div>
-          <div class="summary-card-title">Total Peserta Evaluasi 2</div>
-          <div class="summary-card-value" id="totalEvaluasi2">0</div>
+          <div class="summary-card-title">Sudah Evaluasi 1</div>
+          <div class="summary-card-value" id="totalEvaluasi1">0</div>
           <div class="summary-card-subtitle">Orang</div>
         </div>
 
@@ -629,40 +629,31 @@
 
         <div class="summary-card quaternary">
           <div class="summary-card-icon">
-            <i class="fas fa-chart-line"></i>
+            <i class="fas fa-chart-pie"></i>
           </div>
-          <div class="summary-card-title">Rata-rata per Departemen</div>
-          <div class="summary-card-value" id="rataRata">0</div>
-          <div class="summary-card-subtitle">Orang</div>
+          <div class="summary-card-title">Kepatuhan Evaluasi 1</div>
+          <div class="summary-card-value" id="kepatuhan">0%</div>
+          <div class="summary-card-subtitle">Persentase</div>
         </div>
       </div>
 
       <!-- COMPARISON CHARTS -->
       <div class="comparison-grid">
-        <!-- Chart Evaluasi 1 vs Evaluasi 2 -->
+        <!-- Chart Status Evaluasi 1 -->
         <div class="chart-wrapper">
-          <div class="chart-title">📊 Perbandingan Total Peserta</div>
+          <div class="chart-title">📊 Status Kepatuhan Evaluasi 1</div>
           <div class="chart-container">
-            <canvas id="comparisonChart"></canvas>
+            <canvas id="complianceChart"></canvas>
           </div>
         </div>
 
-        <!-- Chart Per Departemen dengan Tabs -->
+        <!-- Chart Per Departemen -->
         <div class="chart-wrapper">
           <div class="card-header">
             <span>👥 Peserta per Departemen</span>
-            <div class="tabs">
-              <button class="tab-btn active" data-tab="evaluasi1">Evaluasi 1</button>
-              <button class="tab-btn" data-tab="evaluasi2">Evaluasi 2</button>
-            </div>
           </div>
           <div class="chart-container">
-            <div class="tab-content active" id="tab-evaluasi1">
-              <canvas id="departmentChart1"></canvas>
-            </div>
-            <div class="tab-content" id="tab-evaluasi2">
-              <canvas id="departmentChart2"></canvas>
-            </div>
+            <canvas id="departmentChart"></canvas>
           </div>
         </div>
       </div>
@@ -677,14 +668,16 @@
             <thead>
               <tr>
                 <th>Departemen</th>
-                <th>Evaluasi 1</th>
-                <th>Evaluasi 2</th>
-                <th>Total</th>
+                <th>Total Karyawan</th>
+                <th>Sudah (✓)</th>
+                <th>Belum (✗)</th>
+                <th>Kepatuhan</th>
+                <th>Aksi</th>
               </tr>
             </thead>
             <tbody id="comparisonTable">
               <tr>
-                <td colspan="4" class="loading">
+                <td colspan="6" class="loading">
                   <div class="loading-spinner"></div>
                   <div>Memuat data...</div>
                 </td>
@@ -699,8 +692,8 @@
         <a href="evaluasi1.html" class="badge-detail">
           <i class="fas fa-eye"></i> Lihat Detail Evaluasi 1
         </a>
-        <a href="evaluasi2.html" class="badge-detail">
-          <i class="fas fa-eye"></i> Lihat Detail Evaluasi 2
+        <a href="form-evaluasi/form1.html" class="badge-detail" style="background-color: #10b981; border-color: #10b981;">
+          <i class="fas fa-pen-to-square"></i> Form Evaluasi
         </a>
       </div>
 
@@ -712,24 +705,23 @@
     <div class="footer-time" id="clock"></div>
     <div class="footer-brand">
       <div class="footer-brand-item">
-        <img src="assets/images/zinus-putih.webp" class="h-10" alt="Zinus Logo" />
+        <img src="assets/images/zinus-putih.webp" class="h-10" alt="Zinus Logo" onerror="this.style.display='none'" />
         <span>Zinus Dream Indonesia</span>
       </div>
-      <img src="assets/images/hyundai-ori-hitam.png" class="h-10" alt="Hyundai Logo" />
+      <img src="assets/images/hyundai-ori-hitam.png" class="h-10" alt="Hyundai Logo" onerror="this.style.display='none'" />
     </div>
   </footer>
 
   <!-- COPYRIGHT -->
   <div class="footer-copyright">
-    © 2025 Compliance Team | Zinus Indonesia
+    © <span id="year"></span> Compliance Team | Zinus Indonesia
   </div>
 
   <!-- SCRIPT -->
   <script src="assets/js/sheets.js"></script>
   <script>
     // Global variables
-    let evaluasi1Data = [];
-    let evaluasi2Data = [];
+    let departmentSummary = [];
     let charts = {};
 
     // Wait for sheets.js functions to be available
@@ -737,9 +729,7 @@
       return new Promise((resolve, reject) => {
         const start = Date.now();
         const iv = setInterval(() => {
-          if (typeof window.getDepartmentSummary === 'function' && 
-              typeof window.fetchSheet === 'function' &&
-              typeof window.uniqueByName === 'function') {
+          if (typeof window.getDepartmentSummary === 'function') {
             clearInterval(iv);
             resolve();
           } else if (Date.now() - start > timeout) {
@@ -750,64 +740,33 @@
       });
     }
 
-    // Tab switching
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        const tabName = this.getAttribute('data-tab');
-        
-        // Remove active from all
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        
-        // Add active to current
-        this.classList.add('active');
-        document.getElementById(`tab-${tabName}`).classList.add('active');
-      });
-    });
-
     // Fetch and process data
     async function loadData() {
       try {
-        // Fetch data
-        const [data1, data2] = await Promise.all([
-          window.fetchSheet('evaluasi1'),
-          window.fetchSheet('evaluasi2')
-        ]);
+        // Fetch department summary from sheets.js (uses Google Apps Script)
+        const summary = await window.getDepartmentSummary();
+        departmentSummary = summary;
 
-        evaluasi1Data = data1;
-        evaluasi2Data = data2;
-
-        console.log('✅ Data loaded:', {
-          evaluasi1: data1.length,
-          evaluasi2: data2.length
-        });
-
-        // Process summaries
-        const summary1 = window.getDepartmentSummary(data1);
-        const summary2 = window.getDepartmentSummary(data2);
+        console.log('✅ Data loaded:', summary.length, 'departments');
 
         // Calculate totals
-        const total1 = summary1.reduce((sum, item) => sum + item.jumlah, 0);
-        const total2 = summary2.reduce((sum, item) => sum + item.jumlah, 0);
-        const allDepartments = new Set([
-          ...summary1.map(s => s.departemen),
-          ...summary2.map(s => s.departemen)
-        ]);
-        const avgPerDept = allDepartments.size > 0 ? Math.round((total1 + total2) / allDepartments.size) : 0;
+        const totalKaryawan = summary.reduce((sum, item) => sum + item.total, 0);
+        const totalDone = summary.reduce((sum, item) => sum + item.done, 0);
+        const totalPending = summary.reduce((sum, item) => sum + item.pending, 0);
+        const kepatuhan = totalKaryawan > 0 ? Math.round((totalDone / totalKaryawan) * 100) : 0;
 
         // Update summary cards
-        document.getElementById('totalEvaluasi1').textContent = total1;
-        document.getElementById('totalEvaluasi2').textContent = total2;
-        document.getElementById('totalDepartemen').textContent = allDepartments.size;
-        document.getElementById('rataRata').textContent = avgPerDept;
+        document.getElementById('totalKaryawan').textContent = totalKaryawan;
+        document.getElementById('totalEvaluasi1').textContent = totalDone;
+        document.getElementById('totalDepartemen').textContent = summary.length;
+        document.getElementById('kepatuhan').textContent = kepatuhan + '%';
 
         // Create charts
-        createComparisonChart(summary1, summary2);
-        createDepartmentChart(summary1, 'departmentChart1');
-        createDepartmentChart(summary2, 'departmentChart2');
+        createComplianceChart(totalDone, totalPending);
+        createDepartmentChart(summary);
 
         // Create comparison table
-        createComparisonTable(summary1, summary2);
+        createComparisonTable(summary);
 
         // Hide loading
         document.getElementById('loadingOverlay').style.display = 'none';
@@ -818,102 +777,28 @@
           <div class="text-center text-red-600">
             <i class="fas fa-exclamation-triangle text-5xl mb-4"></i>
             <div class="text-lg font-bold">Gagal Memuat Data</div>
-            <div class="text-sm mt-2">Silakan refresh halaman</div>
+            <div class="text-sm mt-2">${error.message}</div>
+            <button onclick="location.reload()" class="mt-4 px-4 py-2 bg-red-600 text-white rounded">Refresh</button>
           </div>
         `;
       }
     }
 
-    // Create comparison chart
-    function createComparisonChart(summary1, summary2) {
-      const ctx = document.getElementById('comparisonChart').getContext('2d');
+    // Create compliance chart (Done vs Pending)
+    function createComplianceChart(done, pending) {
+      const ctx = document.getElementById('complianceChart').getContext('2d');
       
-      // Get totals
-      const total1 = summary1.reduce((sum, item) => sum + item.jumlah, 0);
-      const total2 = summary2.reduce((sum, item) => sum + item.jumlah, 0);
-
-      if (charts.comparison) {
-        charts.comparison.destroy();
+      if (charts.compliance) {
+        charts.compliance.destroy();
       }
 
-      charts.comparison = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: ['Evaluasi 1', 'Evaluasi 2'],
-          datasets: [{
-            label: 'Jumlah Peserta',
-            data: [total1, total2],
-            backgroundColor: ['#329f96', '#10b981'],
-            borderColor: ['#2a8a7f', '#0da274'],
-            borderWidth: 2,
-            borderRadius: 8,
-            hoverBackgroundColor: ['#2a8a7f', '#0da274']
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              display: false
-            },
-            tooltip: {
-              backgroundColor: 'rgba(50, 159, 150, 0.9)',
-              titleColor: '#ffffff',
-              bodyColor: '#ffffff',
-              borderColor: '#ffffff',
-              borderWidth: 1,
-              callbacks: {
-                label: function(context) {
-                  return `Jumlah: ${context.raw} orang`;
-                }
-              }
-            }
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              ticks: {
-                stepSize: 5
-              },
-              grid: {
-                color: 'rgba(0, 0, 0, 0.05)'
-              }
-            },
-            x: {
-              grid: {
-                display: false
-              }
-            }
-          }
-        }
-      });
-    }
-
-    // Create department chart
-    function createDepartmentChart(summary, chartId) {
-      const ctx = document.getElementById(chartId).getContext('2d');
-      
-      const labels = summary.map(item => item.departemen);
-      const data = summary.map(item => item.jumlah);
-
-      const chartName = chartId === 'departmentChart1' ? 'department1' : 'department2';
-      
-      if (charts[chartName]) {
-        charts[chartName].destroy();
-      }
-
-      charts[chartName] = new Chart(ctx, {
+      charts.compliance = new Chart(ctx, {
         type: 'doughnut',
         data: {
-          labels: labels,
+          labels: ['Sudah Mengisi', 'Belum Mengisi'],
           datasets: [{
-            data: data,
-            backgroundColor: [
-              '#329f96', '#10b981', '#0ea5e9', '#8b5cf6', 
-              '#f59e0b', '#ef4444', '#ec4899', '#14b8a6',
-              '#6366f1', '#22d3ee', '#10b981', '#fbbf24'
-            ],
+            data: [done, pending],
+            backgroundColor: ['#10b981', '#ef4444'],
             borderWidth: 2,
             borderColor: '#ffffff',
             hoverOffset: 10
@@ -924,10 +809,10 @@
           maintainAspectRatio: false,
           plugins: {
             legend: {
-              position: 'right',
+              position: 'bottom',
               labels: {
                 font: {
-                  size: 11,
+                  size: 12,
                   family: "'Inter', Arial, sans-serif"
                 },
                 padding: 12,
@@ -954,32 +839,109 @@
       });
     }
 
+    // Create department chart (Bar chart)
+    function createDepartmentChart(summary) {
+      const ctx = document.getElementById('departmentChart').getContext('2d');
+      
+      const labels = summary.map(item => item.departemen);
+      const doneData = summary.map(item => item.done);
+      const pendingData = summary.map(item => item.pending);
+
+      if (charts.department) {
+        charts.department.destroy();
+      }
+
+      charts.department = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Sudah (✓)',
+              data: doneData,
+              backgroundColor: '#10b981',
+              borderColor: '#059669',
+              borderWidth: 2,
+              borderRadius: 6,
+              hoverBackgroundColor: '#059669'
+            },
+            {
+              label: 'Belum (✗)',
+              data: pendingData,
+              backgroundColor: '#ef4444',
+              borderColor: '#dc2626',
+              borderWidth: 2,
+              borderRadius: 6,
+              hoverBackgroundColor: '#dc2626'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                font: {
+                  size: 12,
+                  family: "'Inter', Arial, sans-serif"
+                },
+                padding: 12,
+                color: '#333'
+              }
+            },
+            tooltip: {
+              backgroundColor: 'rgba(50, 159, 150, 0.9)',
+              titleColor: '#ffffff',
+              bodyColor: '#ffffff',
+              borderColor: '#ffffff',
+              borderWidth: 1
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                stepSize: 1
+              },
+              grid: {
+                color: 'rgba(0, 0, 0, 0.05)'
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              },
+              ticks: {
+                maxRotation: 45,
+                minRotation: 45,
+                font: {
+                  size: 11
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
     // Create comparison table
-    function createComparisonTable(summary1, summary2) {
+    function createComparisonTable(summary) {
       const tableBody = document.getElementById('comparisonTable');
       tableBody.innerHTML = '';
 
-      // Create map for easy lookup
-      const map1 = new Map(summary1.map(item => [item.departemen, item.jumlah]));
-      const map2 = new Map(summary2.map(item => [item.departemen, item.jumlah]));
-
-      // Get all unique departments
-      const allDepts = new Set([
-        ...summary1.map(s => s.departemen),
-        ...summary2.map(s => s.departemen)
-      ]);
-
-      // Sort by total descending
-      const sortedDepts = Array.from(allDepts).sort((a, b) => {
-        const totalA = (map1.get(a) || 0) + (map2.get(a) || 0);
-        const totalB = (map1.get(b) || 0) + (map2.get(b) || 0);
-        return totalB - totalA;
+      // Sort by compliance percentage descending
+      const sortedSummary = [...summary].sort((a, b) => {
+        const pctA = a.total > 0 ? (a.done / a.total) * 100 : 0;
+        const pctB = b.total > 0 ? (b.done / b.total) * 100 : 0;
+        return pctB - pctA;
       });
 
-      if (sortedDepts.length === 0) {
+      if (sortedSummary.length === 0) {
         tableBody.innerHTML = `
           <tr>
-            <td colspan="4" style="text-align: center; padding: 2.5rem; color: #6b7280;">
+            <td colspan="6" style="text-align: center; padding: 2.5rem; color: #6b7280;">
               <div style="font-size: 16px; font-weight: 600;">
                 Tidak ada data
               </div>
@@ -989,22 +951,27 @@
         return;
       }
 
-      sortedDepts.forEach(dept => {
-        const count1 = map1.get(dept) || 0;
-        const count2 = map2.get(dept) || 0;
-        const total = count1 + count2;
+      sortedSummary.forEach(item => {
+        const pct = item.total > 0 ? Math.round((item.done / item.total) * 100) : 0;
+        const pctColor = pct === 100 ? '#10b981' : pct >= 50 ? '#f59e0b' : '#ef4444';
 
         const row = document.createElement('tr');
         row.innerHTML = `
-          <td>${escapeHtml(dept)}</td>
-          <td>
-            ${count1 > 0 ? `<span style="color: #329f96; font-weight: bold;">${count1} orang</span>` : '-'}
+          <td style="font-weight:700;">${escapeHtml(item.departemen)}</td>
+          <td style="text-align:center;">${item.total} orang</td>
+          <td style="text-align:center;">
+            <span style="color: #10b981; font-weight: bold;">${item.done}</span>
           </td>
-          <td>
-            ${count2 > 0 ? `<span style="color: #10b981; font-weight: bold;">${count2} orang</span>` : '-'}
+          <td style="text-align:center;">
+            <span style="color: #ef4444; font-weight: bold;">${item.pending}</span>
           </td>
-          <td>
-            <strong style="color: #0ea5e9;">${total} orang</strong>
+          <td style="text-align:center;">
+            <span style="color: ${pctColor}; font-weight: bold; font-size: 15px;">${pct}%</span>
+          </td>
+          <td style="text-align:center;">
+            <a href="detail-evaluasi1.html?dept=${encodeURIComponent(item.departemen)}" class="badge-detail" style="padding: 6px 12px; font-size: 12px;">
+              <i class="fas fa-eye"></i> Detail
+            </a>
           </td>
         `;
         tableBody.appendChild(row);
@@ -1040,6 +1007,7 @@
 
     setInterval(updateClock, 1000);
     updateClock();
+    document.getElementById('year').textContent = new Date().getFullYear();
 
     // Initialize
     waitForSheets(5000)
@@ -1051,6 +1019,7 @@
             <i class="fas fa-exclamation-triangle text-5xl mb-4"></i>
             <div class="text-lg font-bold">Error</div>
             <div class="text-sm mt-2">${error.message}</div>
+            <button onclick="location.reload()" class="mt-4 px-4 py-2 bg-red-600 text-white rounded">Refresh</button>
           </div>
         `;
       });
