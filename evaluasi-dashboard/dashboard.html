@@ -138,54 +138,6 @@
     }
 
     /* ===============================
-       TABS / SLIDES
-       =============================== */
-    .tabs-container {
-      margin-bottom: 24px;
-    }
-
-    .tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .tab-btn {
-      padding: 12px 24px;
-      border: 2px solid #329f96;
-      background-color: white;
-      color: #329f96;
-      border-radius: 8px;
-      font-weight: bold;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      flex: 1;
-      min-width: 120px;
-      text-align: center;
-    }
-
-    .tab-btn.active {
-      background-color: #329f96;
-      color: white;
-    }
-
-    .tab-btn:hover:not(.active) {
-      background-color: #f0f9ff;
-      transform: translateY(-2px);
-    }
-
-    .tab-content {
-      display: none;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    /* ===============================
        CHART CONTAINER
        =============================== */
     .chart-container {
@@ -266,7 +218,8 @@
 
     thead th:nth-child(2),
     thead th:nth-child(3),
-    thead th:nth-child(4) {
+    thead th:nth-child(4),
+    thead th:nth-child(5) {
       text-align: center;
     }
 
@@ -296,7 +249,8 @@
 
     tbody td:nth-child(2),
     tbody td:nth-child(3),
-    tbody td:nth-child(4) {
+    tbody td:nth-child(4),
+    tbody td:nth-child(5) {
       text-align: center;
     }
 
@@ -453,16 +407,6 @@
 
       .summary-card-value {
         font-size: 24px;
-      }
-
-      .tabs {
-        flex-direction: column;
-      }
-
-      .tab-btn {
-        width: 100%;
-        padding: 10px;
-        font-size: 14px;
       }
 
       .chart-container {
@@ -631,7 +575,7 @@
           <div class="summary-card-icon">
             <i class="fas fa-chart-pie"></i>
           </div>
-          <div class="summary-card-title">Kepatuhan Evaluasi 1</div>
+          <div class="summary-card-title">Persentase Evaluasi 1</div>
           <div class="summary-card-value" id="kepatuhan">0%</div>
           <div class="summary-card-subtitle">Persentase</div>
         </div>
@@ -641,7 +585,7 @@
       <div class="comparison-grid">
         <!-- Chart Status Evaluasi 1 -->
         <div class="chart-wrapper">
-          <div class="chart-title">📊 Status Kepatuhan Evaluasi 1</div>
+          <div class="chart-title">📊 Status Evaluasi 1</div>
           <div class="chart-container">
             <canvas id="complianceChart"></canvas>
           </div>
@@ -671,7 +615,7 @@
                 <th>Total Karyawan</th>
                 <th>Sudah (✓)</th>
                 <th>Belum (✗)</th>
-                <th>Kepatuhan</th>
+                <th>Persentase</th>
                 <th>Aksi</th>
               </tr>
             </thead>
@@ -931,7 +875,7 @@
       const tableBody = document.getElementById('comparisonTable');
       tableBody.innerHTML = '';
 
-      // Sort by compliance percentage descending
+      // Sort by percentage descending
       const sortedSummary = [...summary].sort((a, b) => {
         const pctA = a.total > 0 ? (a.done / a.total) * 100 : 0;
         const pctB = b.total > 0 ? (b.done / b.total) * 100 : 0;
