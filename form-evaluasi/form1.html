@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Evaluasi 1 - Form Limbah B3</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ===============================
+       GLOBAL THEME
+       =============================== */
+    :root {
+      --primary-color: #329f96;
+      --primary-dark: #26857d;
+      --bg-color: #e9fbf0;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      font-family: 'Inter', Arial, sans-serif;
+      color: #333;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ===============================
+       HEADER
+       =============================== */
+    .page-header {
+      background-color: var(--primary-color);
+      color: white;
+      border-bottom: 2px solid var(--primary-color);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      transition: padding 0.3s ease;
+    }
+
+    .page-header h1 {
+      font-size: 18px;
+      font-weight: bold;
+      margin: 0;
+      letter-spacing: 0.5px;
+      flex: 1;
+      line-height: 1.3;
+    }
+
+    .header-logo {
+      height: 32px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    /* ===============================
+       CARD / CONTAINER
+       =============================== */
+    .card {
+      background-color: white;
+      border: 2px solid var(--primary-color);
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      margin-bottom: 20px;
+    }
+
+    .card-header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 12px 16px;
+      font-weight: bold;
+      font-size: 18px;
+      text-align: center;
+    }
+
+    .card-body {
+      padding: 20px;
+    }
+
+    /* ===============================
+       FORM ELEMENTS
+       =============================== */
+    .form-group { margin-bottom: 16px; }
+    
+    .form-label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #333;
+      font-size: 14px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      box-sizing: border-box;
+      transition: border-color 0.2s;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(50, 159, 150, 0.2);
+    }
+
+    .form-input[readonly] {
+      background-color: #f3f4f6;
+      color: #6b7280;
+      cursor: not-allowed;
+    }
+
+    /* Question Box */
+    .question-box {
+      background-color: #f9fafb;
+      border-left: 4px solid var(--primary-color);
+      padding: 16px;
+      margin-bottom: 16px;
+      border-radius: 0 6px 6px 0;
+    }
+
+    .question-text {
+      font-weight: 600;
+      margin-bottom: 12px;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 20px;
+    }
+
+    .radio-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 14px;
+      padding: 4px 0;
+    }
+
+    input[type="radio"] {
+      accent-color: var(--primary-color);
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    /* ===============================
+       BUTTONS
+       =============================== */
+    .btn-submit {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 14px 20px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 16px;
+      width: 100%;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .btn-submit:hover { background-color: var(--primary-dark); }
+    
+    .btn-submit:disabled {
+      background-color: #9ca3af;
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
+    /* ===============================
+       FOOTER
+       =============================== */
+    .footer {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 16px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      margin-top: auto;
+      border-top: 2px solid var(--primary-color);
+      text-align: center;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    
+    .footer-logo {
+      height: 24px;
+      filter: brightness(0) invert(1);
+    }
+
+    .footer-text {
+      font-size: 12px;
+      opacity: 0.9;
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    .footer-time {
+      font-weight: 600;
+      font-size: 13px;
+      background: rgba(0,0,0,0.1);
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+
+    /* ===============================
+       CUSTOM MODAL (POPUP)
+       =============================== */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(2px);
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      transform: scale(0.9);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      border-top: 6px solid var(--primary-color);
+    }
+
+    .modal-overlay.active .modal-content {
+      transform: scale(1);
+    }
+
+    .modal-icon {
+      width: 60px;
+      height: 60px;
+      background: #d1fae5;
+      color: var(--primary-color);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      font-size: 30px;
+    }
+
+    .modal-icon.error {
+      background: #fee2e2;
+      color: #ef4444;
+    }
+
+    .modal-title {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: #1f2937;
+    }
+
+    .modal-message {
+      color: #6b7280;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    .modal-btn {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      font-size: 15px;
+    }
+
+    /* Spinner */
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+      display: none;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ===============================
+       RESPONSIVE MOBILE
+       =============================== */
+    @media (max-width: 640px) {
+      .page-header { padding: 10px 12px; gap: 8px; }
+      .header-logo { height: 28px; }
+      .page-header h1 { font-size: 15px; }
+      
+      .card-body { padding: 16px; }
+      
+      .footer { padding: 16px 12px; }
+      .footer-brand { gap: 8px; }
+      .footer-logo { height: 20px; }
+      .footer-text { font-size: 11px; }
+      
+      .radio-group { gap: 15px; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header class="page-header">
+    <img src="../evaluasi-dashboard/assets/images/zinus-putih.webp" alt="Logo" class="header-logo" onerror="this.style.display='none'"> 
+    <h1>Evaluasi 1 — Limbah B3</h1>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="flex-1 p-4 md:p-6 max-w-3xl mx-auto w-full">
+    
+    <div class="card">
+      <div class="card-header">
+        Identitas & Soal Evaluasi
+      </div>
+      
+      <div class="card-body">
+        <form id="evaluationForm" onsubmit="event.preventDefault(); submitForm();">
+          
+          <!-- Identitas Section -->
+          <div class="mb-6 pb-6 border-b border-gray-200">
+            <div class="form-group">
+              <label class="form-label">NIK Karyawan</label>
+              <input type="text" id="nik" class="form-input" placeholder="Ketik NIK Anda..." inputmode="numeric" autocomplete="off">
+              <p id="nik-status" class="text-xs mt-1 h-4 font-semibold"></p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="form-group">
+                <label class="form-label">Nama Karyawan</label>
+                <input type="text" id="nama" class="form-input" readonly tabindex="-1">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Departemen</label>
+                <input type="text" id="departemen" class="form-input" readonly tabindex="-1">
+              </div>
+            </div>
+          </div>
+
+          <!-- Questions Section -->
+          <div id="questions-container">
+            <div class="text-center py-8 text-gray-500">
+              <div class="spinner" style="display:inline-block; border-top-color:#329f96; border-color:#e5e7eb;"></div>
+              <p class="mt-2">Memuat soal evaluasi...</p>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" id="btnSubmit" class="btn-submit" disabled>
+            <div class="spinner" id="btn-spinner"></div>
+            <span id="btn-text">Kirim Jawaban</span>
+          </button>
+
+        </form>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-time" id="clock">Loading...</div>
+    
+    <div class="footer-brand">
+      <img src="../evaluasi-dashboard/assets/images/zinus-putih.webp" alt="Zinus" class="footer-logo" onerror="this.style.display='none'">
+      <span style="font-weight:bold; font-size:16px;">Zinus Dream Indonesia</span>
+      <img src="../evaluasi-dashboard/assets/images/hyundai-ori-hitam.png" alt="Hyundai" class="footer-logo" style="filter:none;" onerror="this.style.display='none'">
+    </div>
+
+    <div class="footer-text">
+      &copy; <span id="year"></span> Powered by Compliance Zinus Indonesia
+    </div>
+  </footer>
+
+  <!-- CUSTOM MODAL POPUP -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-content">
+      <div class="modal-icon" id="modalIcon">✓</div>
+      <div class="modal-title" id="modalTitle">Berhasil!</div>
+      <div class="modal-message" id="modalMessage">Data Anda telah tersimpan.</div>
+      <button class="modal-btn" onclick="closeModal()">Tutup</button>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // =========================================================
+    // KONFIGURASI URL
+    // =========================================================
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwubxaFb1MuDGLLxreh2O7LLNtP54fuihjaVmjUxDnnNP-osEWmMa5DhkUe4Gr_Yvn9/exec';
+    // =========================================================
+
+    let questionsData = [];
+    let isIdentityValid = false;
+    let debounceTimer;
+
+    // 1. Init
+    window.addEventListener('DOMContentLoaded', () => {
+      fetchQuestions();
+      startClock();
+      document.getElementById('year').textContent = new Date().getFullYear();
+      
+      // Add Input Listener for Auto Search
+      const nikInput = document.getElementById('nik');
+      nikInput.addEventListener('input', function(e) {
+        clearTimeout(debounceTimer);
+        const val = e.target.value.trim();
+        
+        // Reset if empty
+        if(!val) {
+          resetIdentity();
+          return;
+        }
+
+        // Debounce: Wait 1 second after user stops typing
+        debounceTimer = setTimeout(() => {
+          checkNik(val);
+        }, 1000);
+      });
+    });
+
+    function fetchQuestions() {
+      fetch(`${SCRIPT_URL}?action=getQuestions`)
+        .then(res => res.json())
+        .then(data => {
+          questionsData = data;
+          renderQuestions(data);
+        })
+        .catch(err => {
+          console.error(err);
+          document.getElementById('questions-container').innerHTML = `
+            <div class="text-center text-red-500 p-4 bg-red-50 rounded">
+              Gagal memuat soal. Periksa koneksi internet.
+            </div>`;
+        });
+    }
+
+    function renderQuestions(questions) {
+      const container = document.getElementById('questions-container');
+      container.innerHTML = '';
+
+      questions.forEach((q, index) => {
+        const qNum = index + 1;
+        const html = `
+          <div class="question-box">
+            <div class="question-text">${qNum}. ${q.soal}</div>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="soal_${qNum}" value="YA" required> YA
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="soal_${qNum}" value="TIDAK" required> TIDAK
+              </label>
+            </div>
+          </div>
+        `;
+        container.innerHTML += html;
+      });
+    }
+
+    // 2. Check NIK Logic
+    function checkNik(nikInput) {
+      const statusEl = document.getElementById('nik-status');
+      const namaEl = document.getElementById('nama');
+      const deptEl = document.getElementById('departemen');
+      const btnSubmit = document.getElementById('btnSubmit');
+
+      statusEl.textContent = 'Mencari data...';
+      statusEl.className = 'text-xs mt-1 h-4 text-blue-500';
+      namaEl.value = '';
+      deptEl.value = '';
+      isIdentityValid = false;
+      btnSubmit.disabled = true;
+
+      fetch(`${SCRIPT_URL}?action=getEmployee&nik=${nikInput}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.status === 'success') {
+            namaEl.value = data.data.nama;
+            deptEl.value = data.data.departemen;
+            statusEl.textContent = 'Data ditemukan.';
+            statusEl.className = 'text-xs mt-1 h-4 text-green-600';
+            isIdentityValid = true;
+            validateForm();
+          } else {
+            statusEl.textContent = 'NIK tidak terdaftar!';
+            statusEl.className = 'text-xs mt-1 h-4 text-red-600';
+            resetIdentity();
+          }
+        })
+        .catch(err => {
+          statusEl.textContent = 'Gagal koneksi server.';
+          statusEl.className = 'text-xs mt-1 h-4 text-red-600';
+        });
+    }
+
+    function resetIdentity() {
+      document.getElementById('nama').value = '';
+      document.getElementById('departemen').value = '';
+      document.getElementById('nik-status').textContent = '';
+      isIdentityValid = false;
+      validateForm();
+    }
+
+    // 3. Validate Form
+    function validateForm() {
+      const btn = document.getElementById('btnSubmit');
+      let allAnswered = true;
+      
+      if (questionsData.length > 0) {
+        for (let i = 1; i <= questionsData.length; i++) {
+          const radios = document.getElementsByName(`soal_${i}`);
+          let answered = false;
+          for (let r of radios) {
+            if (r.checked) { answered = true; break; }
+          }
+          if (!answered) { allAnswered = false; break; }
+        }
+      } else {
+        allAnswered = false;
+      }
+
+      btn.disabled = !(isIdentityValid && allAnswered);
+    }
+
+    document.addEventListener('change', (e) => {
+      if (e.target.type === 'radio') validateForm();
+    });
+
+    // 4. Submit Form
+    function submitForm() {
+      const btn = document.getElementById('btnSubmit');
+      const btnText = document.getElementById('btn-text');
+      const spinner = document.getElementById('btn-spinner');
+
+      btn.disabled = true;
+      btnText.textContent = 'Mengirim...';
+      spinner.style.display = 'block';
+
+      const formData = new FormData();
+      formData.append('nik', document.getElementById('nik').value);
+      formData.append('nama', document.getElementById('nama').value);
+      formData.append('departemen', document.getElementById('departemen').value);
+
+      questionsData.forEach((q, index) => {
+        const qNum = index + 1;
+        const radios = document.getElementsByName(`soal_${qNum}`);
+        for (let r of radios) {
+          if (r.checked) {
+            formData.append(`soal_${qNum}`, r.value);
+            break;
+          }
+        }
+      });
+
+      fetch(SCRIPT_URL, { method: 'POST', body: formData })
+        .then(res => res.json())
+        .then(data => {
+          if (data.result === 'success') {
+            // Sukses
+            showModal('success', 'Berhasil!', 'Jawaban evaluasi Anda telah berhasil disimpan.');
+            setTimeout(() => location.reload(), 2000); 
+          } 
+          else if (data.result === 'duplicate') {
+            // Gagal karena sudah pernah isi
+            showModal('error', 'Sudah Mengisi', 'Anda sudah mengisi evaluasi ini sebelumnya.');
+            btn.disabled = false;
+            btnText.textContent = 'Kirim Jawaban';
+            spinner.style.display = 'none';
+          }
+          else {
+            // Error lainnya
+            showModal('error', 'Gagal', 'Terjadi kesalahan saat menyimpan data.');
+            btn.disabled = false;
+            btnText.textContent = 'Kirim Jawaban';
+            spinner.style.display = 'none';
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          showModal('error', 'Error', 'Gagal terhubung ke server.');
+          btn.disabled = false;
+          btnText.textContent = 'Kirim Jawaban';
+          spinner.style.display = 'none';
+        });
+    }
+
+    // 5. Modal Functions
+    function showModal(type, title, message) {
+      const iconEl = document.getElementById('modalIcon');
+      if (type === 'error') {
+        iconEl.textContent = '✕';
+        iconEl.classList.add('error');
+      } else {
+        iconEl.textContent = '✓';
+        iconEl.classList.remove('error');
+      }
+      
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalMessage').textContent = message;
+      document.getElementById('modalOverlay').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('active');
+    }
+
+    // 6. Clock
+    function startClock() {
+      const update = () => {
+        const now = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+        document.getElementById('clock').textContent = now.toLocaleDateString('id-ID', options) + ' WIB';
+      };
+      update();
+      setInterval(update, 1000);
+    }
+  </script>
+</body>
+</html>

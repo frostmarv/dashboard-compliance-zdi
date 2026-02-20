@@ -13,7 +13,7 @@
        =============================== */
     body {
       background-color: #e9fbf0;
-      font-family: Arial, sans-serif;
+      font-family: 'Inter', Arial, sans-serif;
       color: #333;
       min-height: 100vh;
       margin: 0;
@@ -129,8 +129,6 @@
       overflow-x: auto;
       overflow-y: auto;
       max-height: calc(100vh - 300px);
-      
-      /* Sembunyikan scrollbar */
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
@@ -183,14 +181,33 @@
 
     tbody td:first-child {
       text-align: left;
-      font-weight: 600;
-      color: #4b5563;
-    }
-
-    tbody td:not(:first-child) {
-      text-align: left;
       font-weight: 700;
       color: #1a1a1a;
+    }
+
+    /* ===============================
+       STATUS BADGES
+       =============================== */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .status-done {
+      background-color: #d1fae5;
+      color: #059669;
+      border: 1px solid #059669;
+    }
+
+    .status-pending {
+      background-color: #fee2e2;
+      color: #dc2626;
+      border: 1px solid #dc2626;
     }
 
     /* ===============================
@@ -352,13 +369,13 @@
 
 <body class="min-h-screen flex flex-col">
 
-  <!-- HEADER - HIJAU TOSKA -->
+  <!-- HEADER -->
   <header class="page-header">
-    <img src="assets/images/zinus-putih.webp" alt="Logo Zinus" class="h-8" />
+    <img src="assets/images/zinus-putih.webp" alt="Logo Zinus" class="h-8" onerror="this.style.display='none'" />
     <h1 id="title">Detail Evaluasi Training 1</h1>
   </header>
 
-  <!-- BUTTONS - KEMBALI & EXPORT -->
+  <!-- BUTTONS -->
   <div class="buttons-container">
     <a href="evaluasi1.html" class="btn btn-back">
       Kembali
@@ -378,7 +395,7 @@
           <input
             type="text"
             id="searchInput"
-            placeholder="Cari nama..."
+            placeholder="Cari nama, NIK, atau status (sudah/belum)..."
           />
         </div>
 
@@ -387,14 +404,16 @@
           <table>
             <thead>
               <tr>
-                <th>Timestamp</th>
-                <th>Nama</th>
+                <th>NIK</th>
+                <th>Nama Karyawan</th>
                 <th>Departemen</th>
+                <th>Status</th>
+                <th>Waktu Input</th>
               </tr>
             </thead>
             <tbody id="table">
               <tr>
-                <td colspan="3" class="loading">
+                <td colspan="5" class="loading">
                   <div class="spinner"></div>
                   <div>Memuat data...</div>
                 </td>
@@ -406,18 +425,15 @@
     </div>
   </main>
 
-  <!-- FOOTER - HIJAU TOSKA -->
+  <!-- FOOTER -->
   <footer class="footer">
-    <div class="footer-time" id="clock">
-      <!-- Waktu akan di-inject di sini -->
-    </div>
-
+    <div class="footer-time" id="clock"></div>
     <div class="footer-brand">
       <div class="footer-brand-item">
-        <img src="assets/images/zinus-putih.webp" class="h-10" alt="Zinus Logo" />
+        <img src="assets/images/zinus-putih.webp" class="h-10" alt="Zinus Logo" onerror="this.style.display='none'" />
         <span>Zinus Dream Indonesia</span>
       </div>
-      <img src="assets/images/hyundai-ori-hitam.png" class="h-10" alt="Hyundai Logo" />
+      <img src="assets/images/hyundai-ori-hitam.png" class="h-10" alt="Hyundai Logo" onerror="this.style.display='none'" />
     </div>
   </footer>
 
@@ -433,6 +449,7 @@
     let rawData = [];
     let filteredData = [];
 
+    // Render Table
     function renderTable(data) {
       const table = document.getElementById('table');
       table.innerHTML = '';
@@ -440,33 +457,49 @@
       if (data.length === 0) {
         table.innerHTML = `
           <tr>
-            <td colspan="3" style="text-align: center; padding: 2.5rem; color: #6b7280;">
-              <div style="font-size: 16px; font-weight: 600;">
-                Tidak ada data
-              </div>
+            <td colspan="5" style="text-align: center; padding: 2.5rem; color: #6b7280;">
+              <div style="font-size: 16px; font-weight: 600;">Tidak ada data</div>
             </td>
           </tr>
         `;
         return;
       }
 
+      // Sort: Belum mengisi dulu (di atas), lalu sudah mengisi
+      data.sort((a, b) => {
+        if (a.status === b.status) return a.nama.localeCompare(b.nama);
+        return a.status === 'pending' ? -1 : 1;
+      });
+
       data.forEach(d => {
         const row = document.createElement('tr');
+        const isDone = d.status === 'done';
+        
         row.innerHTML = `
-          <td>${d.timestamp || '-'}</td>
+          <td style="font-weight:700;">${d.nik || '-'}</td>
           <td>${escapeHtml(d.nama || '-')}</td>
           <td>${escapeHtml(d.departemen || '-')}</td>
+          <td>
+            <span class="status-badge ${isDone ? 'status-done' : 'status-pending'}">
+              ${isDone ? '✓' : '✗'} ${isDone ? 'Sudah' : 'Belum'}
+            </span>
+          </td>
+          <td style="font-size:12px; color:#6b7280;">
+            ${isDone ? d.waktu : '-'}
+          </td>
         `;
         table.appendChild(row);
       });
     }
 
-    // Export to Excel
+    // Export to Excel (TANPA NILAI)
     function exportToExcel() {
       const exportData = filteredData.map(item => ({
-        Timestamp: item.timestamp || '-',
+        NIK: item.nik || '-',
         Nama: item.nama || '-',
-        Departemen: item.departemen || '-'
+        Departemen: item.departemen || '-',
+        Status: item.status === 'done' ? 'Sudah' : 'Belum',
+        Waktu: item.waktu || '-'
       }));
 
       if (exportData.length === 0) {
@@ -474,55 +507,70 @@
         return;
       }
 
-      exportToCSV(
-        `detail_evaluasi1_${dept || 'semua'}_${new Date().toISOString().slice(0, 10)}.csv`,
-        exportData
+      const headers = Object.keys(exportData[0]).join(',');
+      const rows = exportData.map(row => 
+        Object.values(row).map(val => `"${String(val).replace(/"/g, '""')}"`).join(',')
       );
+      const csv = [headers, ...rows].join('\n');
+      
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `detail_evaluasi1_${dept || 'semua'}_${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     }
 
-    // Fetch data
-    fetchSheet('evaluasi1')
-      .then(data => {
-        console.log('✅ Data mentah:', data.length, 'baris');
+    // Fetch Data using getDepartmentDetail from sheets.js
+    if (typeof window.getDepartmentDetail === 'function') {
+      window.getDepartmentDetail(dept)
+        .then(allData => {
+          console.log('✅ Total karyawan:', allData.length);
+          
+          const doneCount = allData.filter(d => d.status === 'done').length;
+          const pendingCount = allData.filter(d => d.status === 'pending').length;
+          
+          console.log(`✅ Sudah: ${doneCount}, Belum: ${pendingCount}`);
 
-        // Filter berdasarkan departemen
-        let filteredByDept = data;
-        if (dept) {
-          filteredByDept = data.filter(d => d.departemen === dept);
-          console.log(`✅ Filter departemen "${dept}":`, filteredByDept.length, 'baris');
-        }
-
-        // Hapus duplikat nama
-        rawData = uniqueByName(filteredByDept);
-        console.log('✅ Setelah filter duplikat:', rawData.length, 'baris unik');
-
-        filteredData = [...rawData];
-        renderTable(filteredData);
-      })
-      .catch(error => {
-        console.error('❌ Error loading data:', error);
-        document.getElementById('table').innerHTML = `
-          <tr>
-            <td colspan="3" style="text-align: center; padding: 2.5rem; color: #dc2626;">
-              <div style="font-size: 18px; font-weight: bold; margin-bottom: 8px;">
-                Gagal Memuat Data
-              </div>
-              <div style="font-size: 14px; color: #6b7280;">
-                Silakan coba lagi nanti atau hubungi administrator
-              </div>
-            </td>
-          </tr>
-        `;
-      });
+          rawData = allData;
+          filteredData = [...rawData];
+          renderTable(filteredData);
+        })
+        .catch(error => {
+          console.error('❌ Error loading data:', error);
+          document.getElementById('table').innerHTML = `
+            <tr>
+              <td colspan="5" style="text-align: center; padding: 2.5rem; color: #dc2626;">
+                <div style="font-size: 18px; font-weight: bold; margin-bottom: 8px;">Gagal Memuat Data</div>
+                <div style="font-size: 14px; color: #6b7280;">${error.message}</div>
+              </td>
+            </tr>
+          `;
+        });
+    } else {
+      document.getElementById('table').innerHTML = `
+        <tr>
+          <td colspan="5" style="text-align: center; padding: 2.5rem; color: #dc2626;">
+            <div style="font-size: 18px; font-weight: bold; margin-bottom: 8px;">sheets.js Tidak Dimuat</div>
+            <div style="font-size: 14px; color: #6b7280;">Pastikan file sheets.js sudah diupdate</div>
+          </td>
+        </tr>
+      `;
+    }
 
     // Search functionality
     document.getElementById('searchInput').addEventListener('input', e => {
       const keyword = e.target.value.toLowerCase().trim();
 
       filteredData = rawData.filter(d => 
+        (d.nik && d.nik.toLowerCase().includes(keyword)) ||
         (d.nama && d.nama.toLowerCase().includes(keyword)) ||
-        (d.timestamp && d.timestamp.toLowerCase().includes(keyword)) ||
-        (d.departemen && d.departemen.toLowerCase().includes(keyword))
+        (d.departemen && d.departemen.toLowerCase().includes(keyword)) ||
+        (d.status === 'done' && ('sudah'.includes(keyword))) ||
+        (d.status === 'pending' && ('belum'.includes(keyword)))
       );
 
       renderTable(filteredData);
@@ -542,19 +590,16 @@
     // CLOCK
     function updateClock() {
       const now = new Date();
-      
       const dateStr = now.toLocaleDateString("id-ID", {
         day: "2-digit",
         month: "long",
         year: "numeric",
       });
-      
       const timeStr = now.toLocaleTimeString("id-ID", {
         hour: "2-digit",
         minute: "2-digit",
         second: "2-digit",
       }) + " WIB";
-      
       document.getElementById("clock").innerHTML = `
         <div class="date">${dateStr}</div>
         <div class="time">${timeStr}</div>

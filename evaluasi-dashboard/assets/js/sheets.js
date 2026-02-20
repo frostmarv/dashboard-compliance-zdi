@@ -1,118 +1,137 @@
-// ✅ SHEETS.JS - All functions exported to window
+// ✅ SHEETS.JS - Connector to Google Apps Script
 (function() {
   'use strict';
 
-  // Google Sheets URLs
-  const SHEETS = {
-    evaluasi1: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT6w6f01zKeCm8Xzx2nFGk1qGXVQbeOTHK8G6MoJLrjhM-XfGjgYE-Vq2eKMtOh6VboifRXZvSrW0R_/pub?output=csv',
-    evaluasi2: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQgocuvj3VAPt3n7xYgzHxWcECqxmu26KBO-rJQqAg6XlI_AKutOuZlP3PNznjeRyrBbtgzkAksL8mn/pub?gid=916136123&single=true&output=csv' // ⚠️ GANTI DENGAN LINK SHEET EVALUASI 2
-  };
+  // ⚠️ GANTI URL INI DENGAN URL WEB APP ANDA
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwubxaFb1MuDGLLxreh2O7LLNtP54fuihjaVmjUxDnnNP-osEWmMa5DhkUe4Gr_Yvn9/exec';
 
-  // Parse CSV
-  const parseCSV = function(csvText) {
-    const lines = csvText.trim().split(/\r?\n/);
-    if (lines.length < 2) return [];
-    const rows = lines.slice(1).filter(line => line.trim() !== '');
-    return rows.map(line => {
-      const fields = [];
-      let inQuotes = false;
-      let current = '';
-      for (let i = 0; i < line.length; i++) {
-        const char = line[i];
-        if (char === '"') {
-          if (inQuotes && line[i + 1] === '"') {
-            current += '"';
-            i++;
-          } else {
-            inQuotes = !inQuotes;
-          }
-        } else if (char === ',' && !inQuotes) {
-          fields.push(current.trim());
-          current = '';
-        } else {
-          current += char;
-        }
-      }
-      fields.push(current.trim());
-      return {
-        timestamp: fields[0] || '',
-        nama: fields[2] || '',
-        departemen: fields[3] || ''
-      };
-    });
-  };
-
-  // Fetch Google Sheet
-  const fetchSheet = async function(type) {
-    if (!SHEETS[type]) {
-      console.error(`❌ Unknown sheet type: ${type}`);
-      console.error('Available types:', Object.keys(SHEETS).join(', '));
-      throw new Error(`Unknown sheet type: ${type}. Available: ${Object.keys(SHEETS).join(', ')}`);
-    }
+  // Fetch All Employees from Database
+  const fetchAllEmployees = async function() {
     try {
-      console.log(`📊 Fetching sheet: ${type}...`);
-      const res = await fetch(SHEETS[type], { method: 'GET', headers: { 'Accept': 'text/csv' } });
-      console.log(`📊 Response status: ${res.status}`);
+      console.log('📊 Fetching all employees...');
+      const res = await fetch(`${SCRIPT_URL}?action=getAllEmployees`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const csv = await res.text();
-      console.log(`📊 CSV fetched: ${csv.length} chars`);
-      const data = parseCSV(csv);
-      console.log(`📊 Parsed: ${data.length} rows`);
-      const filtered = data.filter(d => d.nama && d.departemen);
-      console.log(`📊 Filtered: ${filtered.length} complete rows`);
-      return filtered;
+      const data = await res.json();
+      console.log(`📊 Employees fetched: ${data.length} rows`);
+      return data;
     } catch (error) {
-      console.error('❌ Error in fetchSheet:', error);
+      console.error('❌ Error in fetchAllEmployees:', error);
       throw error;
     }
   };
 
-  // Get unique names
-  const uniqueByName = function(data) {
-    const seen = new Map();
-    const result = [];
-    for (const item of data) {
-      const key = item.nama.trim().toLowerCase();
-      if (!seen.has(key)) {
-        seen.set(key, true);
-        result.push(item);
+  // Fetch All Responses from Responses Sheet
+  const fetchAllResponses = async function() {
+    try {
+      console.log('📊 Fetching all responses...');
+      const res = await fetch(`${SCRIPT_URL}?action=getAllResponses`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      console.log(`📊 Responses fetched: ${data.length} rows`);
+      return data;
+    } catch (error) {
+      console.error('❌ Error in fetchAllResponses:', error);
+      throw error;
+    }
+  };
+
+  // Get All Unique Departments from Database
+  const getAllDepartments = async function() {
+    const employees = await fetchAllEmployees();
+    const deptSet = new Set();
+    
+    employees.forEach(emp => {
+      if (emp.departemen) {
+        deptSet.add(emp.departemen);
       }
-    }
-    return result;
-  };
-
-  // Group by department
-  const groupByDepartmentFiltered = function(data) {
-    const uniqueData = uniqueByName(data);
-    const map = {};
-    for (const item of uniqueData) {
-      const dept = item.departemen;
-      if (!map[dept]) map[dept] = [];
-      map[dept].push(item);
-    }
-    return map;
-  };
-
-  // Get department summary
-  const getDepartmentSummary = function(data) {
-    console.log('🔍 getDepartmentSummary called with', data.length, 'rows');
-    if (!data || data.length === 0) return [];
-    const grouped = groupByDepartmentFiltered(data);
-    return Object.entries(grouped).map(([departemen, items]) => ({
-      departemen,
-      jumlah: items.length
-    }));
-  };
-
-  // Find duplicate names
-  const findDuplicateNames = function(data) {
-    const count = {};
-    const normalized = data.map(d => {
-      const key = d.nama.trim().toLowerCase();
-      count[key] = (count[key] || 0) + 1;
-      return { ...d, _key: key };
     });
-    return normalized.filter(d => count[d._key] > 1);
+    
+    return Array.from(deptSet).sort();
+  };
+
+  // Get Department Summary (Total Employees per Department from Database)
+  const getDepartmentSummary = async function() {
+    const employees = await fetchAllEmployees();
+    const responses = await fetchAllResponses();
+    
+    // Map responses by NIK
+    const responseMap = {};
+    responses.forEach(r => {
+      responseMap[r.nik] = r;
+    });
+    
+    // Group by department
+    const deptMap = {};
+    
+    employees.forEach(emp => {
+      const dept = emp.departemen;
+      if (!deptMap[dept]) {
+        deptMap[dept] = {
+          departemen: dept,
+          total: 0,
+          done: 0,
+          pending: 0
+        };
+      }
+      
+      deptMap[dept].total++;
+      
+      if (responseMap[emp.nik]) {
+        deptMap[dept].done++;
+      } else {
+        deptMap[dept].pending++;
+      }
+    });
+    
+    return Object.values(deptMap).sort((a, b) => a.departemen.localeCompare(b.departemen));
+  };
+
+  // Get Completion Status for Specific Department
+  const getDepartmentDetail = async function(deptFilter) {
+    const employees = await fetchAllEmployees();
+    const responses = await fetchAllResponses();
+    
+    // Map responses by NIK
+    const responseMap = {};
+    responses.forEach(r => {
+      responseMap[r.nik] = r;
+    });
+    
+    // Filter by department if specified
+    let filteredEmployees = employees;
+    if (deptFilter) {
+      filteredEmployees = employees.filter(emp => emp.departemen === deptFilter);
+    }
+    
+    // Merge data with status
+    const status = filteredEmployees.map(emp => {
+      const response = responseMap[emp.nik];
+      return {
+        nik: emp.nik,
+        nama: emp.nama,
+        departemen: emp.departemen,
+        status: response ? 'done' : 'pending',
+        nilai: response ? response.nilai : '-',
+        waktu: response ? response.waktu : '-'
+      };
+    });
+    
+    return status;
+  };
+
+  // Get Completion Status (All Employees)
+  const getCompletionStatus = async function() {
+    return await getDepartmentDetail(null);
+  };
+
+  // Get Summary Stats
+  const getSummaryStats = function(statusData) {
+    const total = statusData.length;
+    const done = statusData.filter(d => d.status === 'done').length;
+    const pending = total - done;
+    const percent = total > 0 ? Math.round((done / total) * 100) : 0;
+    
+    return { total, done, pending, percent };
   };
 
   // Export to CSV
@@ -140,46 +159,36 @@
     console.log(`✅ Exported ${rows.length} rows to ${filename}`);
   };
 
-  // Export department detail
-  const exportDepartemenDetail = async function(type) {
-    if (!SHEETS[type]) throw new Error(`Unknown sheet type: ${type}`);
-    const data = await fetchSheet(type);
-    const grouped = groupByDepartmentFiltered(data);
-    const rows = [];
-    for (const [dept, items] of Object.entries(grouped)) {
-      for (const item of items) {
-        rows.push({ departemen: dept, nama: item.nama, timestamp: item.timestamp });
-      }
-    }
-    const filename = `detail_departemen_unik_${type}.csv`;
-    exportToCSV(filename, rows);
+  // Export Department Detail
+  const exportDepartemenDetail = async function(dept) {
+    const status = await getDepartmentDetail(dept);
+    const filename = `detail_evaluasi1_${dept || 'semua'}_${new Date().toISOString().split('T')[0]}.csv`;
+    exportToCSV(filename, status);
   };
 
-  // Export double input
-  const exportDoubleInput = async function(type) {
-    if (!SHEETS[type]) throw new Error(`Unknown sheet type: ${type}`);
-    const data = await fetchSheet(type);
-    const doubles = findDuplicateNames(data);
-    const clean = doubles.map(({ _key, ...rest }) => rest);
-    const filename = `double_input_${type}.csv`;
-    exportToCSV(filename, clean);
+  // Export Pending List
+  const exportPendingList = async function(dept) {
+    const status = await getDepartmentDetail(dept);
+    const pending = status.filter(s => s.status === 'pending');
+    const filename = `belum_mengisi_${dept || 'semua'}_${new Date().toISOString().split('T')[0]}.csv`;
+    exportToCSV(filename, pending);
   };
 
-  // Export to window - this is critical!
-  window.parseCSV = parseCSV;
-  window.fetchSheet = fetchSheet;
-  window.uniqueByName = uniqueByName;
-  window.groupByDepartmentFiltered = groupByDepartmentFiltered;
+  // Export to window
+  window.fetchAllEmployees = fetchAllEmployees;
+  window.fetchAllResponses = fetchAllResponses;
+  window.getAllDepartments = getAllDepartments;
   window.getDepartmentSummary = getDepartmentSummary;
-  window.findDuplicateNames = findDuplicateNames;
+  window.getDepartmentDetail = getDepartmentDetail;
+  window.getCompletionStatus = getCompletionStatus;
+  window.getSummaryStats = getSummaryStats;
   window.exportToCSV = exportToCSV;
   window.exportDepartemenDetail = exportDepartemenDetail;
-  window.exportDoubleInput = exportDoubleInput;
+  window.exportPendingList = exportPendingList;
 
-  console.log('%c✅ sheets.js loaded - All functions ready!', 'color: green; font-weight: bold; font-size: 13px');
-  console.log('  ✓ Available sheets:', Object.keys(SHEETS).join(', '));
-  console.log('  ✓ fetchSheet:', typeof window.fetchSheet);
-  console.log('  ✓ uniqueByName:', typeof window.uniqueByName);
+  console.log('%c✅ sheets.js loaded - Connected to Google Apps Script!', 'color: green; font-weight: bold; font-size: 13px');
+  console.log('  ✓ SCRIPT_URL:', SCRIPT_URL.substring(0, 50) + '...');
   console.log('  ✓ getDepartmentSummary:', typeof window.getDepartmentSummary);
+  console.log('  ✓ getDepartmentDetail:', typeof window.getDepartmentDetail);
 
 })();

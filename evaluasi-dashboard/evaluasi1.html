@@ -47,7 +47,7 @@
     }
 
     /* ===============================
-       TOMBOL KEMBALI - SEJAJAR DENGAN CARD
+       TOMBOL KEMBALI
        =============================== */
     .btn-back-between {
       background-color: white;
@@ -81,7 +81,7 @@
     }
 
     /* ===============================
-       CARD / CONTAINER - PUTIH
+       CARD / CONTAINER
        =============================== */
     .card {
       background-color: white;
@@ -94,9 +94,6 @@
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     }
 
-    /* ===============================
-       SLIDE HEADER - HIJAU TOSKA
-       =============================== */
     .slide-header {
       background-color: #329f96;
       color: white;
@@ -104,8 +101,6 @@
       font-weight: bold;
       font-size: 18px;
       text-align: center;
-      border-top-left-radius: 8px;
-      border-top-right-radius: 8px;
       flex-shrink: 0;
       display: flex;
       justify-content: center;
@@ -153,7 +148,8 @@
     }
 
     thead th:nth-child(2),
-    thead th:nth-child(3) {
+    thead th:nth-child(3),
+    thead th:nth-child(4) {
       text-align: center;
     }
 
@@ -182,12 +178,36 @@
     }
 
     tbody td:nth-child(2),
-    tbody td:nth-child(3) {
+    tbody td:nth-child(3),
+    tbody td:nth-child(4) {
       text-align: center;
     }
 
     /* ===============================
-       BADGE DETAIL - HIJAU TOSKA
+       STATUS BADGES
+       =============================== */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .status-good {
+      background-color: #d1fae5;
+      color: #059669;
+    }
+
+    .status-warning {
+      background-color: #fef3c7;
+      color: #d97706;
+    }
+
+    /* ===============================
+       BADGE DETAIL
        =============================== */
     .badge-detail {
       display: inline-flex;
@@ -220,7 +240,7 @@
     }
 
     /* ===============================
-       FOOTER - HIJAU TOSKA
+       FOOTER
        =============================== */
     .footer {
       background-color: #329f96;
@@ -291,7 +311,7 @@
     }
 
     /* ===============================
-       RESPONSIVE - MOBILE OPTIMIZED
+       RESPONSIVE
        =============================== */
     @media (max-width: 768px) {
       .page-header {
@@ -418,7 +438,7 @@
 
   <!-- HEADER -->
   <header class="page-header">
-    <img src="assets/images/zinus-putih.webp" alt="Logo Zinus" class="h-8" />
+    <img src="assets/images/zinus-putih.webp" alt="Logo Zinus" class="h-8" onerror="this.style.display='none'" />
     <h1>Evaluasi 1 — Rekap Departemen</h1>
   </header>
 
@@ -443,13 +463,15 @@
             <thead>
               <tr>
                 <th>Departemen</th>
-                <th>Jumlah</th>
-                <th>Status</th>
+                <th>Total Karyawan</th>
+                <th>Sudah (✓)</th>
+                <th>Belum (✗)</th>
+                <th>Aksi</th>
               </tr>
             </thead>
             <tbody id="table">
               <tr>
-                <td colspan="3" class="loading">
+                <td colspan="5" class="loading">
                   <div class="loading-spinner"></div>
                   <div>Memuat data...</div>
                 </td>
@@ -466,53 +488,47 @@
     <div class="footer-time" id="clock"></div>
     <div class="footer-brand">
       <div class="footer-brand-item">
-        <img src="assets/images/zinus-putih.webp" class="h-10" alt="Zinus Logo" />
+        <img src="assets/images/zinus-putih.webp" class="h-10" alt="Zinus Logo" onerror="this.style.display='none'" />
         <span>Zinus Dream Indonesia</span>
       </div>
-      <img src="assets/images/hyundai-ori-hitam.png" class="h-10" alt="Hyundai Logo" />
+      <img src="assets/images/hyundai-ori-hitam.png" class="h-10" alt="Hyundai Logo" onerror="this.style.display='none'" />
     </div>
   </footer>
 
   <!-- SCRIPT -->
   <script src="assets/js/sheets.js"></script>
   <script>
-    // 🔥 HANYA GUNAKAN FUNGSI DARI sheets.js — TIDAK ADA LOGIC DI SINI
     console.log('📊 Starting evaluasi1.html script...');
-    console.log('📊 Window functions check:', {
-      getDepartmentSummary: typeof window.getDepartmentSummary,
-      fetchSheet: typeof window.fetchSheet
-    });
     
-    // Wait for sheets.js functions to be available (polling, no reload)
+    // Wait for sheets.js functions
     function waitForSheets(timeout = 5000) {
       return new Promise((resolve, reject) => {
         const start = Date.now();
         const iv = setInterval(() => {
-          if (typeof window.getDepartmentSummary === 'function' && typeof window.fetchSheet === 'function') {
+          if (typeof window.getDepartmentSummary === 'function') {
             clearInterval(iv);
             resolve();
           } else if (Date.now() - start > timeout) {
             clearInterval(iv);
-            reject(new Error('sheets.js functions not available in time'));
+            reject(new Error('sheets.js functions not available'));
           }
         }, 100);
       });
     }
 
     waitForSheets(5000)
-      .then(() => window.fetchSheet("evaluasi1"))
-      .then(data => {
-        console.log('📊 Data fetched:', data.length, 'rows');
-        const summary = window.getDepartmentSummary(data); // ✅ DEDUP + FILTERED
+      .then(() => window.getDepartmentSummary())
+      .then(summary => {
+        console.log('📊 Department summary:', summary.length, 'departments');
         const table = document.getElementById("table");
         table.innerHTML = '';
 
         if (summary.length === 0) {
           table.innerHTML = `
             <tr>
-              <td colspan="3" style="text-align: center; padding: 2.5rem; color: #6b7280;">
-                <div style="font-size: 18px; font-weight: bold; margin-bottom: 8px;">Tidak Ada Data</div>
-                <div style="font-size: 14px; color: #6b7280;">Belum ada data evaluasi yang tersedia</div>
+              <td colspan="5" style="text-align: center; padding: 2.5rem; color: #6b7280;">
+                <div style="font-size: 18px; font-weight: bold; margin-bottom: 8px;">Belum Ada Data</div>
+                <div style="font-size: 14px; color: #6b7280;">Belum ada data karyawan di database</div>
               </td>
             </tr>
           `;
@@ -521,10 +537,15 @@
 
         summary.forEach(item => {
           const row = document.createElement('tr');
+          const percent = item.total > 0 ? Math.round((item.done / item.total) * 100) : 0;
+          const statusClass = percent === 100 ? 'status-good' : 'status-warning';
+          
           row.innerHTML = `
             <td>${escapeHtml(item.departemen)}</td>
-            <td>${item.jumlah} orang</td>
-            <td>
+            <td style="text-align:center; font-weight:bold;">${item.total} orang</td>
+            <td style="text-align:center; font-weight:bold; color:#059669;">${item.done}</td>
+            <td style="text-align:center; font-weight:bold; color:#dc2626;">${item.pending}</td>
+            <td style="text-align:center;">
               <a href="detail-evaluasi1.html?dept=${encodeURIComponent(item.departemen)}" class="badge-detail">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -541,15 +562,14 @@
         console.error('Error loading data:', error);
         document.getElementById("table").innerHTML = `
           <tr>
-            <td colspan="3" style="text-align: center; padding: 2.5rem; color: #dc2626;">
+            <td colspan="5" style="text-align: center; padding: 2.5rem; color: #dc2626;">
               <div style="font-size: 18px; font-weight: bold; margin-bottom: 8px;">Gagal Memuat Data</div>
-              <div style="font-size: 14px; color: #6b7280;">Silakan coba lagi nanti atau hubungi administrator</div>
+              <div style="font-size: 14px; color: #6b7280;">${error.message}</div>
             </td>
           </tr>
         `;
       });
 
-    // ✅ Escape HTML tetap dipertahankan (aman)
     function escapeHtml(text) {
       const div = document.createElement('div');
       div.textContent = text;
@@ -577,16 +597,6 @@
 
     setInterval(updateClock, 1000);
     updateClock();
-
-    // Mobile detection
-    function isMobileDevice() {
-      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
-             (window.innerWidth <= 768);
-    }
-
-    if (isMobileDevice()) {
-      document.body.classList.add('mobile-optimized');
-    }
   </script>
 
 </body>
