@@ -91,6 +91,70 @@
     }
 
     /* ===============================
+       STATUS BANNER
+       =============================== */
+    .status-banner {
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border: 2px solid;
+      display: none; /* Hidden by default */
+      animation: slideDown 0.3s ease;
+    }
+
+    .status-banner.locked {
+      display: block;
+      background-color: #fef2f2;
+      border-color: #ef4444;
+      color: #991b1b;
+    }
+
+    .status-banner.open {
+      display: block;
+      background-color: #f0fdf4;
+      border-color: #10b981;
+      color: #065f46;
+    }
+
+    .status-banner.deadline {
+      display: block;
+      background-color: #fefce8;
+      border-color: #f59e0b;
+      color: #92400e;
+    }
+
+    .status-banner-title {
+      font-weight: bold;
+      font-size: 16px;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-banner-message {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .countdown-timer {
+      margin-top: 12px;
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+      font-size: 18px;
+      text-align: center;
+      padding: 8px;
+      background: rgba(0,0,0,0.05);
+      border-radius: 6px;
+      color: #dc2626;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===============================
        FORM ELEMENTS
        =============================== */
     .form-group { margin-bottom: 16px; position: relative; }
@@ -110,7 +174,7 @@
 
     .form-input {
       width: 100%;
-      padding: 12px 40px 12px 12px; /* Added right padding for icon */
+      padding: 12px 40px 12px 12px;
       border: 1px solid #d1d5db;
       border-radius: 6px;
       font-family: 'Inter', sans-serif;
@@ -127,13 +191,12 @@
       box-shadow: 0 0 0 3px rgba(50, 159, 150, 0.2);
     }
 
-    .form-input[readonly] {
+    .form-input[readonly], .form-input[disabled] {
       background-color: #f3f4f6;
       color: #6b7280;
       cursor: not-allowed;
     }
 
-    /* Icon inside Input (Loading, Check, Cross) */
     .input-icon {
       position: absolute;
       right: 12px;
@@ -144,20 +207,11 @@
       justify-content: center;
       width: 24px;
       height: 24px;
-      pointer-events: none; /* Let clicks pass through */
+      pointer-events: none;
     }
 
-    .input-icon svg {
-      width: 20px;
-      height: 20px;
-    }
-
-    /* Spinner Animation */
-    .spinner-icon {
-      animation: spin 1s linear infinite;
-      color: var(--primary-color);
-    }
-
+    .input-icon svg { width: 20px; height: 20px; }
+    .spinner-icon { animation: spin 1s linear infinite; color: var(--primary-color); }
     .success-icon { color: #10b981; }
     .error-icon { color: #ef4444; }
 
@@ -199,6 +253,11 @@
       width: 18px;
       height: 18px;
       cursor: pointer;
+    }
+
+    input[type="radio"]:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
     }
 
     /* ===============================
@@ -330,6 +389,11 @@
       background: #fee2e2;
       color: #ef4444;
     }
+    
+    .modal-icon.warning {
+      background: #fef3c7;
+      color: #d97706;
+    }
 
     .modal-title {
       font-size: 20px;
@@ -356,7 +420,6 @@
       font-size: 15px;
     }
 
-    /* Spinner for Button */
     .btn-spinner {
       width: 20px;
       height: 20px;
@@ -374,15 +437,13 @@
       .page-header { padding: 10px 12px; gap: 8px; }
       .header-logo { height: 28px; }
       .page-header h1 { font-size: 15px; }
-      
       .card-body { padding: 16px; }
-      
       .footer { padding: 16px 12px; }
       .footer-brand { gap: 8px; }
       .footer-logo { height: 20px; }
       .footer-text { font-size: 11px; }
-      
       .radio-group { gap: 15px; }
+      .countdown-timer { font-size: 16px; }
     }
   </style>
 </head>
@@ -404,50 +465,57 @@
       </div>
       
       <div class="card-body">
-        <form id="evaluationForm" onsubmit="event.preventDefault(); submitForm();">
-          
-          <!-- Identitas Section -->
-          <div class="mb-6 pb-6 border-b border-gray-200">
-            <div class="form-group">
-              <label class="form-label">NIK Karyawan</label>
-              <!-- Added Input Wrapper for positioning icons -->
-              <div class="input-wrapper">
-                <input type="text" id="nik" class="form-input" placeholder="Ketik NIK Anda..." inputmode="numeric" autocomplete="off">
-                
-                <!-- Icon Container -->
-                <div class="input-icon" id="nik-icon-container">
-                  <!-- Content injected via JS: Spinner, Check, or Cross -->
+        
+        <!-- STATUS BANNER (SELALU MUNCUL DI ATAS) -->
+        <div id="statusBanner" class="status-banner">
+          <div class="status-banner-title" id="statusTitle"></div>
+          <div class="status-banner-message" id="statusMessage"></div>
+          <div class="countdown-timer" id="countdownTimer" style="display: none;"></div>
+        </div>
+
+        <!-- CONTAINER SOAL (AKAN DISEMBUNYIKAN JIKA LOCKED) -->
+        <div id="questions-wrapper">
+            <form id="evaluationForm" onsubmit="event.preventDefault(); submitForm();">
+              
+              <!-- Identitas Section -->
+              <div class="mb-6 pb-6 border-b border-gray-200">
+                <div class="form-group">
+                  <label class="form-label">NIK Karyawan</label>
+                  <div class="input-wrapper">
+                    <input type="text" id="nik" class="form-input" placeholder="Ketik NIK Anda..." inputmode="numeric" autocomplete="off">
+                    <div class="input-icon" id="nik-icon-container"></div>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div class="form-group">
+                    <label class="form-label">Nama Karyawan</label>
+                    <input type="text" id="nama" class="form-input" readonly tabindex="-1">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Departemen</label>
+                    <input type="text" id="departemen" class="form-input" readonly tabindex="-1">
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div class="form-group">
-                <label class="form-label">Nama Karyawan</label>
-                <input type="text" id="nama" class="form-input" readonly tabindex="-1">
+              <!-- Questions Section -->
+              <div id="questions-container">
+                <div class="text-center py-8 text-gray-500">
+                  <div class="spinner-icon" style="display:inline-block; color:#329f96;"></div>
+                  <p class="mt-2">Memuat soal evaluasi...</p>
+                </div>
               </div>
-              <div class="form-group">
-                <label class="form-label">Departemen</label>
-                <input type="text" id="departemen" class="form-input" readonly tabindex="-1">
-              </div>
-            </div>
-          </div>
 
-          <!-- Questions Section -->
-          <div id="questions-container">
-            <div class="text-center py-8 text-gray-500">
-              <div class="spinner-icon" style="display:inline-block; color:#329f96;"></div>
-              <p class="mt-2">Memuat soal evaluasi...</p>
-            </div>
-          </div>
+              <!-- Submit Button -->
+              <button type="submit" id="btnSubmit" class="btn-submit" disabled>
+                <div class="btn-spinner" id="btn-spinner"></div>
+                <span id="btn-text">Kirim Jawaban</span>
+              </button>
 
-          <!-- Submit Button -->
-          <button type="submit" id="btnSubmit" class="btn-submit" disabled>
-            <div class="btn-spinner" id="btn-spinner"></div>
-            <span id="btn-text">Kirim Jawaban</span>
-          </button>
+            </form>
+        </div> <!-- End Questions Wrapper -->
 
-        </form>
       </div>
     </div>
 
@@ -483,12 +551,15 @@
     // =========================================================
     // KONFIGURASI URL
     // =========================================================
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwubxaFb1MuDGLLxreh2O7LLNtP54fuihjaVmjUxDnnNP-osEWmMa5DhkUe4Gr_Yvn9/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwr4mDaILM0BuBy_DQ8kyPR8HWC3uCPFkW5o2a_MPrCkZTbEfEuscy-pAM0CxsUSOTl/exec';
     // =========================================================
 
     let questionsData = [];
     let isIdentityValid = false;
+    let isFormLocked = false;
     let debounceTimer;
+    let countdownInterval = null;
+    let isSubmitting = false; // Mencegah double submit
 
     // Helper: SVG Icons
     const ICONS = {
@@ -499,28 +570,129 @@
 
     // 1. Init
     window.addEventListener('DOMContentLoaded', () => {
+      checkFormStatus(); // ← CEK STATUS DULU
       fetchQuestions();
       startClock();
       document.getElementById('year').textContent = new Date().getFullYear();
       
-      // Add Input Listener for Auto Search
       const nikInput = document.getElementById('nik');
       nikInput.addEventListener('input', function(e) {
         clearTimeout(debounceTimer);
         const val = e.target.value.trim();
-        
-        // Reset if empty
         if(!val) {
           resetIdentity();
           return;
         }
-
-        // Debounce: Wait 1 second after user stops typing
         debounceTimer = setTimeout(() => {
           checkNik(val);
         }, 1000);
       });
     });
+
+    // === CEK STATUS FORM (LOGIKA BARU: 3 KONDISI) ===
+    async function checkFormStatus() {
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=getFormStatus&t=${Date.now()}`);
+        const data = await res.json();
+        
+        const banner = document.getElementById('statusBanner');
+        const title = document.getElementById('statusTitle');
+        const message = document.getElementById('statusMessage');
+        const countdownEl = document.getElementById('countdownTimer');
+        const questionsWrapper = document.getElementById('questions-wrapper');
+        
+        const now = new Date();
+        const closeTime = data.closeTime ? new Date(data.closeTime) : null;
+        
+        // Reset classes
+        banner.className = 'status-banner';
+        
+        // === LOGIKA BARU ===
+        // 1. isLocked = true -> LOCKED (Merah)
+        // 2. isLocked = false + showCountdown = true -> OPEN + COUNTDOWN (Kuning)
+        // 3. isLocked = false + showCountdown = false -> OPEN NORMAL (Hijau)
+
+        if (data.isLocked) {
+          // KONDISI 3: LOCKED (TRUE + Waktu Kosong/Habis)
+          isFormLocked = true;
+          if(questionsWrapper) questionsWrapper.style.display = 'none';
+          
+          banner.classList.add('locked');
+          title.innerHTML = '🔒 Form Ditutup';
+          message.textContent = data.message;
+          countdownEl.style.display = 'none';
+        } 
+        else if (data.showCountdown) {
+          // KONDISI 1: OPEN + COUNTDOWN (TRUE + Ada Waktu)
+          isFormLocked = false;
+          if(questionsWrapper) questionsWrapper.style.display = 'block';
+          
+          banner.classList.add('deadline');
+          title.innerHTML = '⏰ Waktu Tersisa';
+          message.textContent = data.message;
+          countdownEl.style.display = 'block';
+          startCountdown(closeTime, countdownEl);
+        }
+        else {
+          // KONDISI 2: OPEN NORMAL (FALSE - Force Open)
+          isFormLocked = false;
+          if(questionsWrapper) questionsWrapper.style.display = 'block';
+          
+          banner.classList.add('open');
+          title.innerHTML = '✅ Form Terbuka';
+          message.textContent = 'Silakan isi evaluasi dengan lengkap.';
+          countdownEl.style.display = 'none';
+        }
+        
+        // Update tombol submit
+        const btnSubmit = document.getElementById('btnSubmit');
+        if(isFormLocked) {
+            btnSubmit.disabled = true;
+            btnSubmit.innerHTML = '<span>Form Ditutup</span>';
+        } else {
+            validateForm();
+        }
+        
+      } catch (error) {
+        console.warn('⚠️ Gagal cek status, form dianggap terbuka:', error);
+        isFormLocked = false;
+        if(document.getElementById('questions-wrapper')) document.getElementById('questions-wrapper').style.display = 'block';
+        validateForm();
+      }
+    }
+
+    // === COUNTDOWN TIMER ===
+    function startCountdown(closeTime, element) {
+      stopCountdown();
+      
+      function update() {
+        const now = new Date();
+        const diff = closeTime - now;
+        
+        if (diff <= 0) {
+          stopCountdown();
+          checkFormStatus(); // Re-check status (akan jadi Locked)
+          return;
+        }
+        
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        
+        element.textContent = `${String(days).padStart(2,'0')}h ${String(hours).padStart(2,'0')}j ${String(minutes).padStart(2,'0')}m ${String(seconds).padStart(2,'0')}d`;
+      }
+      
+      update();
+      countdownInterval = setInterval(update, 1000);
+    }
+
+    function stopCountdown() {
+      if (countdownInterval) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+      }
+    }
 
     function fetchQuestions() {
       fetch(`${SCRIPT_URL}?action=getQuestions`)
@@ -563,14 +735,14 @@
 
     // 2. Check NIK Logic
     function checkNik(nikInput) {
+      if (isFormLocked) return;
+
       const iconContainer = document.getElementById('nik-icon-container');
       const namaEl = document.getElementById('nama');
       const deptEl = document.getElementById('departemen');
       const btnSubmit = document.getElementById('btnSubmit');
 
-      // Show Spinner
       iconContainer.innerHTML = ICONS.spinner;
-      
       namaEl.value = '';
       deptEl.value = '';
       isIdentityValid = false;
@@ -582,18 +754,11 @@
           if (data.status === 'success') {
             namaEl.value = data.data.nama;
             deptEl.value = data.data.departemen;
-            
-            // Show Check Icon
             iconContainer.innerHTML = ICONS.check;
-            
             isIdentityValid = true;
             validateForm();
           } else {
-            // Show Cross Icon
             iconContainer.innerHTML = ICONS.cross;
-            
-            // PERBAIKAN: Jangan panggil resetIdentity() di sini karena akan menghapus ikon X
-            // Cukup kosongkan field nama dan departemen secara manual
             namaEl.value = '';
             deptEl.value = '';
             isIdentityValid = false;
@@ -601,9 +766,7 @@
           }
         })
         .catch(err => {
-          // Show Cross Icon on Error
           iconContainer.innerHTML = ICONS.cross;
-          // Also clear fields on network error
           namaEl.value = '';
           deptEl.value = '';
           isIdentityValid = false;
@@ -614,7 +777,7 @@
     function resetIdentity() {
       document.getElementById('nama').value = '';
       document.getElementById('departemen').value = '';
-      document.getElementById('nik-icon-container').innerHTML = ''; // Clear icon only when input is empty
+      document.getElementById('nik-icon-container').innerHTML = '';
       isIdentityValid = false;
       validateForm();
     }
@@ -622,6 +785,12 @@
     // 3. Validate Form
     function validateForm() {
       const btn = document.getElementById('btnSubmit');
+      
+      if (isFormLocked) {
+        btn.disabled = true;
+        return;
+      }
+
       let allAnswered = true;
       
       if (questionsData.length > 0) {
@@ -644,8 +813,16 @@
       if (e.target.type === 'radio') validateForm();
     });
 
-    // 4. Submit Form
+    // 4. Submit Form (WITH AUTO-RETRY)
     function submitForm() {
+      if (isFormLocked) {
+        showModal('error', 'Form Ditutup', 'Form evaluasi sedang ditutup.');
+        return;
+      }
+
+      if (isSubmitting) return; // Mencegah double klik
+      isSubmitting = true;
+
       const btn = document.getElementById('btnSubmit');
       const btnText = document.getElementById('btn-text');
       const spinner = document.getElementById('btn-spinner');
@@ -670,47 +847,81 @@
         }
       });
 
-      fetch(SCRIPT_URL, { method: 'POST', body: formData })
-        .then(res => res.json())
-        .then(data => {
-          if (data.result === 'success') {
-            // Sukses
-            showModal('success', 'Berhasil!', 'Jawaban evaluasi Anda telah berhasil disimpan.');
-            setTimeout(() => location.reload(), 2000); 
-          } 
-          else if (data.result === 'duplicate') {
-            // Gagal karena sudah pernah isi
-            showModal('error', 'Sudah Mengisi', 'Anda sudah mengisi evaluasi ini sebelumnya.');
-            btn.disabled = false;
-            btnText.textContent = 'Kirim Jawaban';
-            spinner.style.display = 'none';
-          }
-          else {
-            // Error lainnya
-            showModal('error', 'Gagal', 'Terjadi kesalahan saat menyimpan data.');
-            btn.disabled = false;
-            btnText.textContent = 'Kirim Jawaban';
-            spinner.style.display = 'none';
-          }
-        })
-        .catch(err => {
-          console.error(err);
-          showModal('error', 'Error', 'Gagal terhubung ke server.');
-          btn.disabled = false;
-          btnText.textContent = 'Kirim Jawaban';
-          spinner.style.display = 'none';
-        });
+      // LOGIKA RETRY OTOMATIS
+      let retryCount = 0;
+      const maxRetry = 3;
+
+      function sendRequest() {
+        fetch(SCRIPT_URL, { method: 'POST', body: formData })
+          .then(res => res.json())
+          .then(data => {
+            if (data.result === 'success') {
+              showModal('success', 'Berhasil!', 'Jawaban evaluasi Anda telah berhasil disimpan.');
+              setTimeout(() => location.reload(), 2000); 
+            } 
+            else if (data.result === 'duplicate') {
+              showModal('error', 'Sudah Mengisi', 'Anda sudah mengisi evaluasi ini sebelumnya.');
+              resetSubmitState();
+            }
+            else if (data.code === 'SERVER_BUSY') {
+              // === AUTO RETRY LOGIC ===
+              if (retryCount < maxRetry) {
+                retryCount++;
+                btnText.textContent = `Server Sibuk, coba lagi (${retryCount}/${maxRetry})...`;
+                setTimeout(sendRequest, 3000); // Tunggu 3 detik sebelum retry
+              } else {
+                showModal('warning', 'Gagal Kirim', 'Server terlalu sibuk setelah 3x percobaan. Silakan coba beberapa saat lagi.');
+                resetSubmitState();
+              }
+            }
+            else if (data.code === 'FORM_LOCKED' || data.code === 'TIME_EXPIRED') {
+              showModal('error', 'Form Ditutup', data.message);
+              checkFormStatus();
+              resetSubmitState();
+            }
+            else {
+              showModal('error', 'Gagal', 'Terjadi kesalahan: ' + (data.message || 'Unknown error'));
+              resetSubmitState();
+            }
+          })
+          .catch(err => {
+            console.error(err);
+            // Network error juga bisa di-retry
+            if (retryCount < maxRetry) {
+              retryCount++;
+              btnText.textContent = `Koneksi Error, coba lagi (${retryCount}/${maxRetry})...`;
+              setTimeout(sendRequest, 3000);
+            } else {
+              showModal('error', 'Error', 'Gagal terhubung ke server setelah beberapa percobaan.');
+              resetSubmitState();
+            }
+          });
+      }
+
+      function resetSubmitState() {
+        isSubmitting = false;
+        btn.disabled = false;
+        btnText.textContent = 'Kirim Jawaban';
+        spinner.style.display = 'none';
+        validateForm(); // Cek lagi validitas form
+      }
+
+      sendRequest(); // Mulai request pertama
     }
 
     // 5. Modal Functions
     function showModal(type, title, message) {
       const iconEl = document.getElementById('modalIcon');
+      iconEl.className = 'modal-icon'; // Reset class
+      
       if (type === 'error') {
         iconEl.textContent = '✕';
         iconEl.classList.add('error');
+      } else if (type === 'warning') {
+        iconEl.textContent = '⚠';
+        iconEl.classList.add('warning');
       } else {
         iconEl.textContent = '✓';
-        iconEl.classList.remove('error');
       }
       
       document.getElementById('modalTitle').textContent = title;
@@ -732,6 +943,10 @@
       update();
       setInterval(update, 1000);
     }
+
+    window.addEventListener('beforeunload', () => {
+      stopCountdown();
+    });
   </script>
 </body>
 </html>

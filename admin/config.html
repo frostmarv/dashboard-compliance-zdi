@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin - Konfigurasi Evaluasi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      background-color: #e9fbf0;
+      font-family: 'Inter', Arial, sans-serif;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+    }
+    .navbar {
+      background-color: #329f96;
+      color: white;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .navbar-logo { height: 32px; }
+    .navbar-text { font-weight: bold; font-size: 18px; }
+    .container { max-width: 800px; margin: 40px auto; padding: 0 16px; }
+    .card {
+      background: white;
+      border: 2px solid #329f96;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    .card-header {
+      font-size: 20px;
+      font-weight: bold;
+      color: #329f96;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #e9fbf0;
+    }
+    .card-info {
+      background: #fef3c7;
+      border: 2px solid #f59e0b;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+    .card-info-title {
+      font-weight: bold;
+      color: #92400e;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-info-text {
+      color: #78350f;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .form-group { margin-bottom: 16px; }
+    .form-label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #333;
+      font-size: 14px;
+    }
+    .form-select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    .form-select:focus {
+      outline: none;
+      border-color: #329f96;
+      box-shadow: 0 0 0 3px rgba(50, 159, 150, 0.2);
+    }
+    .btn {
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-primary {
+      background-color: #329f96;
+      color: white;
+    }
+    .btn-primary:hover {
+      background-color: #26857d;
+      transform: translateY(-2px);
+    }
+    .btn-danger {
+      background-color: #dc2626;
+      color: white;
+    }
+    .btn-danger:hover {
+      background-color: #b91c1c;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .status-open {
+      background-color: #d1fae5;
+      color: #059669;
+    }
+    .status-closed {
+      background-color: #fee2e2;
+      color: #dc2626;
+    }
+    .code-block {
+      background: #1f2937;
+      color: #10b981;
+      padding: 16px;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      overflow-x: auto;
+      margin-top: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <img src="../assets/images/zinus-putih.webp" alt="Logo" class="navbar-logo" onerror="this.style.display='none'">
+    <span class="navbar-text">Admin - Konfigurasi Evaluasi</span>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="container">
+
+    <!-- INFO CARD -->
+    <div class="card-info">
+      <div class="card-info-title">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        Cara Mengubah Status Form
+      </div>
+      <div class="card-info-text">
+        <ol class="list-decimal list-inside space-y-2">
+          <li>Klik tombol <strong>"Buka"</strong> atau <strong>"Tutup"</strong> di bawah</li>
+          <li>Salin kode JSON yang muncul</li>
+          <li>Buka file <code>admin/config.json</code> di GitHub</li>
+          <li>Paste kode JSON tersebut dan commit</li>
+          <li>Form akan terupdate otomatis dalam 1-2 menit</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- CONFIG FORM -->
+    <div class="card">
+      <div class="card-header">⚙️ Konfigurasi Form Evaluasi</div>
+      
+      <div class="form-group">
+        <label class="form-label">Pilih Evaluasi</label>
+        <select id="evalName" class="form-select" onchange="updatePreview()">
+          <option value="evaluasi1">Evaluasi 1 - Limbah B3</option>
+          <option value="evaluasi2">Evaluasi 2</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Status Form</label>
+        <div class="flex gap-4">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="status" value="open" class="w-4 h-4" style="accent-color: #10b981;" onchange="updatePreview()">
+            <span class="font-medium text-green-600">🟢 Open</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="status" value="closed" class="w-4 h-4" style="accent-color: #dc2626;" onchange="updatePreview()">
+            <span class="font-medium text-red-600">🔴 Closed</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Pesan untuk User</label>
+        <input type="text" id="message" class="form-select" value="Form evaluasi terbuka" oninput="updatePreview()">
+      </div>
+
+      <!-- PREVIEW JSON -->
+      <div class="form-group">
+        <label class="form-label">Preview JSON (Salin ini ke config.json)</label>
+        <div class="code-block" id="jsonPreview">{}</div>
+        <button class="btn btn-primary mt-4" onclick="copyJSON()">📋 Salin JSON</button>
+      </div>
+
+      <div class="flex gap-4">
+        <a href="../index.html" class="btn btn-danger">← Kembali ke Home</a>
+      </div>
+    </div>
+
+    <!-- CURRENT STATUS -->
+    <div class="card">
+      <div class="card-header">📊 Status Saat Ini (Dari config.json)</div>
+      <div id="currentStatus">
+        <div class="loading text-center text-gray-500">Memuat status...</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SCRIPT -->
+  <script>
+    let currentConfig = {};
+
+    // Load current config from JSON file
+    async function loadCurrentConfig() {
+      try {
+        const res = await fetch('config.json?t=' + Date.now()); // Cache busting
+        const data = await res.json();
+        currentConfig = data;
+        displayCurrentStatus();
+      } catch (error) {
+        document.getElementById('currentStatus').innerHTML = `
+          <div class="text-red-600">
+            <div class="font-bold">⚠️ Tidak dapat membaca config.json</div>
+            <div class="text-sm mt-1">Pastikan file config.json ada di folder admin/</div>
+          </div>
+        `;
+      }
+    }
+
+    // Display current status
+    function displayCurrentStatus() {
+      const evalName = document.getElementById('evalName').value;
+      const config = currentConfig[evalName];
+      
+      if (!config) {
+        document.getElementById('currentStatus').innerHTML = `
+          <div class="text-gray-500">Belum ada konfigurasi untuk ${evalName}</div>
+        `;
+        return;
+      }
+      
+      const statusClass = config.status === 'open' ? 'status-open' : 'status-closed';
+      const statusText = config.status === 'open' ? '🟢 Open' : '🔴 Closed';
+      
+      document.getElementById('currentStatus').innerHTML = `
+        <div class="flex items-center justify-between flex-wrap gap-4">
+          <div>
+            <div class="text-sm text-gray-600 mb-1">Status Form</div>
+            <div class="status-badge ${statusClass}">${statusText}</div>
+          </div>
+          <div>
+            <div class="text-sm text-gray-600 mb-1">Pesan</div>
+            <div class="font-medium">${config.message}</div>
+          </div>
+          <div>
+            <div class="text-sm text-gray-600 mb-1">Terakhir Update</div>
+            <div class="font-medium">${config.updatedAt || '-'}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Update JSON preview
+    function updatePreview() {
+      const evalName = document.getElementById('evalName').value;
+      const status = document.querySelector('input[name="status"]:checked').value;
+      const message = document.getElementById('message').value;
+      const today = new Date().toISOString().split('T')[0];
+      
+      const preview = {
+        [evalName]: {
+          status: status,
+          message: message,
+          updatedAt: today
+        }
+      };
+      
+      // Merge with existing config
+      const fullConfig = { ...currentConfig, ...preview };
+      
+      document.getElementById('jsonPreview').textContent = JSON.stringify(fullConfig, null, 2);
+    }
+
+    // Copy JSON to clipboard
+    function copyJSON() {
+      const jsonText = document.getElementById('jsonPreview').textContent;
+      navigator.clipboard.writeText(jsonText).then(() => {
+        alert('✅ JSON berhasil disalin! Silakan paste ke file admin/config.json di GitHub');
+      }).catch(() => {
+        alert('❌ Gagal menyalin. Silakan copy manual.');
+      });
+    }
+
+    // Initialize
+    window.addEventListener('DOMContentLoaded', () => {
+      loadCurrentConfig();
+      updatePreview();
+    });
+  </script>
+
+</body>
+</html>

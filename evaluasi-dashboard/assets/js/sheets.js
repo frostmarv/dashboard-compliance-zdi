@@ -3,7 +3,7 @@
   'use strict';
 
   // ⚠️ GANTI URL INI DENGAN URL WEB APP ANDA
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwubxaFb1MuDGLLxreh2O7LLNtP54fuihjaVmjUxDnnNP-osEWmMa5DhkUe4Gr_Yvn9/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwr4mDaILM0BuBy_DQ8kyPR8HWC3uCPFkW5o2a_MPrCkZTbEfEuscy-pAM0CxsUSOTl/exec';
 
   // Fetch All Employees from Database
   const fetchAllEmployees = async function() {
