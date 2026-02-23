@@ -395,6 +395,11 @@
       color: #d97706;
     }
 
+    .modal-icon.success-low {
+      background: #fef3c7;
+      color: #d97706;
+    }
+
     .modal-title {
       font-size: 20px;
       font-weight: bold;
@@ -406,6 +411,23 @@
       color: #6b7280;
       margin-bottom: 24px;
       line-height: 1.5;
+    }
+
+    .modal-score {
+      font-size: 32px;
+      font-weight: bold;
+      color: var(--primary-color);
+      margin: 16px 0;
+      padding: 12px;
+      background: #f0fdf4;
+      border-radius: 8px;
+      border: 2px solid var(--primary-color);
+    }
+
+    .modal-score.low {
+      color: #d97706;
+      background: #fefce8;
+      border-color: #f59e0b;
     }
 
     .modal-btn {
@@ -541,6 +563,12 @@
     <div class="modal-content">
       <div class="modal-icon" id="modalIcon">✓</div>
       <div class="modal-title" id="modalTitle">Berhasil!</div>
+      
+      <!-- NILAI AKAN MUNCUL DI SINI -->
+      <div id="modalScoreContainer" style="display: none;">
+        <div class="modal-score" id="modalScore">0/100</div>
+      </div>
+      
       <div class="modal-message" id="modalMessage">Data Anda telah tersimpan.</div>
       <button class="modal-btn" onclick="closeModal()">Tutup</button>
     </div>
@@ -551,7 +579,7 @@
     // =========================================================
     // KONFIGURASI URL
     // =========================================================
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwr4mDaILM0BuBy_DQ8kyPR8HWC3uCPFkW5o2a_MPrCkZTbEfEuscy-pAM0CxsUSOTl/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx9MzkhXr2iDj8xW5KS_1fFul2FY9c-0Eqkj64014lk2czELE4SxySztdC8uRoaLr6h/exec';
     // =========================================================
 
     let questionsData = [];
@@ -813,7 +841,7 @@
       if (e.target.type === 'radio') validateForm();
     });
 
-    // 4. Submit Form (WITH AUTO-RETRY)
+    // 4. Submit Form (WITH AUTO-RETRY & SCORE DISPLAY)
     function submitForm() {
       if (isFormLocked) {
         showModal('error', 'Form Ditutup', 'Form evaluasi sedang ditutup.');
@@ -856,8 +884,10 @@
           .then(res => res.json())
           .then(data => {
             if (data.result === 'success') {
-              showModal('success', 'Berhasil!', 'Jawaban evaluasi Anda telah berhasil disimpan.');
-              setTimeout(() => location.reload(), 2000); 
+              // === TAMPILKAN NILAI DI POPUP ===
+              const nilai = data.nilai || 0;
+              showModal('success', 'Berhasil!', 'Jawaban evaluasi Anda telah berhasil disimpan.', nilai);
+              setTimeout(() => location.reload(), 3000); 
             } 
             else if (data.result === 'duplicate') {
               showModal('error', 'Sudah Mengisi', 'Anda sudah mengisi evaluasi ini sebelumnya.');
@@ -909,10 +939,15 @@
       sendRequest(); // Mulai request pertama
     }
 
-    // 5. Modal Functions
-    function showModal(type, title, message) {
+    // 5. Modal Functions (UPDATED: Support Score Display)
+    function showModal(type, title, message, score = null) {
       const iconEl = document.getElementById('modalIcon');
+      const scoreContainer = document.getElementById('modalScoreContainer');
+      const scoreEl = document.getElementById('modalScore');
+      
       iconEl.className = 'modal-icon'; // Reset class
+      scoreContainer.style.display = 'none';
+      scoreEl.className = 'modal-score';
       
       if (type === 'error') {
         iconEl.textContent = '✕';
@@ -920,8 +955,25 @@
       } else if (type === 'warning') {
         iconEl.textContent = '⚠';
         iconEl.classList.add('warning');
-      } else {
+      } else if (type === 'success') {
         iconEl.textContent = '✓';
+        
+        // === TAMPILKAN NILAI JIKA ADA ===
+        if (score !== null) {
+          scoreContainer.style.display = 'block';
+          scoreEl.textContent = `${score}/100`;
+          
+          // Warna berdasarkan nilai (Passing Grade: 70)
+          if (score >= 70) {
+            // Lulus - Hijau
+            iconEl.classList.remove('error', 'warning');
+            scoreEl.classList.remove('low');
+          } else {
+            // Tidak Lulus - Kuning/Warning
+            iconEl.classList.add('warning');
+            scoreEl.classList.add('low');
+          }
+        }
       }
       
       document.getElementById('modalTitle').textContent = title;
