@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin - Generate PDF Evaluasi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    body {
+      background-color: #e9fbf0;
+      font-family: 'Inter', Arial, sans-serif;
+      color: #333;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+    }
+
+    .page-header {
+      background-color: #329f96;
+      color: white;
+      border-bottom: 2px solid #329f96;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .page-header h1 {
+      font-size: 18px;
+      font-weight: bold;
+      margin: 0;
+      flex: 1;
+    }
+
+    .card {
+      background-color: white;
+      border: 2px solid #329f96;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-header {
+      background-color: #329f96;
+      color: white;
+      padding: 16px;
+      font-weight: bold;
+      font-size: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .table-container {
+      overflow-x: auto;
+      max-height: 600px;
+      overflow-y: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    thead th {
+      background-color: #329f96;
+      color: white;
+      padding: 14px 16px;
+      text-align: left;
+      font-weight: bold;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+
+    tbody tr:hover {
+      background-color: #f0f8ff;
+    }
+
+    tbody td {
+      padding: 12px 16px;
+      white-space: nowrap;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 13px;
+      border: 2px solid;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-primary {
+      background-color: #329f96;
+      color: white;
+      border-color: #329f96;
+    }
+
+    .btn-primary:hover {
+      background-color: white;
+      color: #329f96;
+    }
+
+    .btn-success {
+      background-color: #10b981;
+      color: white;
+      border-color: #10b981;
+    }
+
+    .btn-success:hover {
+      background-color: white;
+      color: #10b981;
+    }
+
+    .btn-warning {
+      background-color: #f59e0b;
+      color: white;
+      border-color: #f59e0b;
+    }
+
+    .btn-warning:hover {
+      background-color: white;
+      color: #f59e0b;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .checkbox-cell {
+      text-align: center;
+      width: 50px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .status-generated {
+      background-color: #d1fae5;
+      color: #059669;
+      border: 1px solid #059669;
+    }
+
+    .status-pending {
+      background-color: #fee2e2;
+      color: #dc2626;
+      border: 1px solid #dc2626;
+    }
+
+    .footer {
+      background-color: #329f96;
+      color: white;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      margin-top: auto;
+    }
+
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(255, 255, 255, 0.95);
+      z-index: 1000;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid #329f96;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .filter-section {
+      padding: 16px;
+      background-color: #f9fafb;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .filter-section select,
+    .filter-section input {
+      padding: 8px 12px;
+      border: 2px solid #329f96;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .bulk-actions {
+      padding: 12px 16px;
+      background-color: #fef3c7;
+      border-bottom: 1px solid #fcd34d;
+      display: none;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .bulk-actions.active {
+      display: flex;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex flex-col">
+
+  <!-- HEADER -->
+  <header class="page-header">
+    <img src="../assets/images/zinus-putih.webp" alt="Logo Zinus" class="h-8" onerror="this.style.display='none'" />
+    <h1>Admin - Generate PDF Evaluasi</h1>
+    <a href="../index.html" class="btn btn-primary" style="background: white; color: #329f96;">
+      <i class="fas fa-home"></i> Home
+    </a>
+  </header>
+
+  <!-- MAIN -->
+  <main class="flex-1 p-4">
+    <div class="max-w-7xl mx-auto w-full">
+      
+      <!-- CARD -->
+      <div class="card">
+        <div class="card-header">
+          <span>📋 Daftar Evaluasi yang Sudah Diisi</span>
+          <div class="flex gap-2">
+            <button id="selectAllBtn" class="btn btn-primary" style="padding: 6px 12px; font-size: 12px;">
+              <i class="fas fa-check-square"></i> Pilih Semua
+            </button>
+            <button id="generateSelectedBtn" class="btn btn-success" style="padding: 6px 12px; font-size: 12px;" disabled>
+              <i class="fas fa-file-pdf"></i> Generate PDF Terpilih (<span id="selectedCount">0</span>)
+            </button>
+          </div>
+        </div>
+
+        <!-- FILTER (TANPA FACTORY) -->
+        <div class="filter-section">
+          <label style="font-weight: 600;">Departemen:</label>
+          <select id="filterDept" onchange="applyFilters()">
+            <option value="all">Semua</option>
+          </select>
+
+          <label style="font-weight: 600;">Status PDF:</label>
+          <select id="filterStatus" onchange="applyFilters()">
+            <option value="all">Semua</option>
+            <option value="generated">Sudah Generate</option>
+            <option value="pending">Belum Generate</option>
+          </select>
+
+          <input type="text" id="searchInput" placeholder="Cari nama atau NIK..." onkeyup="applyFilters()" 
+                 style="flex: 1; min-width: 200px;">
+        </div>
+
+        <!-- BULK ACTIONS BAR -->
+        <div id="bulkActions" class="bulk-actions">
+          <i class="fas fa-info-circle"></i>
+          <span><strong id="bulkCount">0</strong> data terpilih</span>
+          <button id="generateBulkBtn" class="btn btn-success">
+            <i class="fas fa-file-pdf"></i> Generate PDF
+          </button>
+          <button id="cancelBulkBtn" class="btn btn-warning">
+            <i class="fas fa-times"></i> Batal
+          </button>
+        </div>
+
+        <!-- TABLE -->
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th class="checkbox-cell">
+                  <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
+                </th>
+                <th>NIK</th>
+                <th>Nama</th>
+                <th>Departemen</th>
+                <th>Tanggal Input</th>
+                <th>Nilai</th>
+                <th>Status PDF</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody">
+              <tr>
+                <td colspan="8" class="loading" style="text-align: center; padding: 40px;">
+                  <div class="spinner" style="margin: 0 auto 16px;"></div>
+                  <div>Memuat data...</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- LOADING OVERLAY -->
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="spinner"></div>
+    <div style="margin-top: 16px; font-weight: bold; font-size: 16px;" id="loadingText">
+      Memproses PDF...
+    </div>
+    <div style="margin-top: 8px; font-size: 14px; color: #6b7280;" id="loadingProgress">
+      0 / 0
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div id="clock"></div>
+    <div style="display: flex; align-items: center; gap: 16px;">
+      <img src="../assets/images/zinus-putih.webp" class="h-10" alt="Zinus Logo" onerror="this.style.display='none'" />
+      <span style="font-weight: bold; font-size: 22px;">Zinus Global Indonesia</span>
+    </div>
+  </footer>
+
+  <!-- SCRIPT -->
+  <script>
+    // ==============================
+    // KONFIGURASI - URL TANPA SPASI!
+    // ==============================
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzcFd52A1CcwSkJlHaxsjaQFsa2JIeBWsynhh0oYqm5VBv2lGRSYOAPkmVRl8zYdqmG/exec';
+    
+    let allData = [];
+    let filteredData = [];
+    let selectedRowIndices = new Set();
+
+    // ==========================================
+    // INITIALIZATION
+    // ==========================================
+    async function init() {
+      try {
+        await loadData();
+        populateDepartmentFilter();
+        setupEventListeners();
+      } catch (error) {
+        console.error('Init error:', error);
+        document.getElementById('tableBody').innerHTML = `
+          <tr>
+            <td colspan="8" style="text-align: center; padding: 40px; color: #dc2626;">
+              <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 16px;"></i>
+              <div style="font-size: 18px; font-weight: bold;">Gagal Memuat Data</div>
+              <div>${error.message}</div>
+              <button onclick="location.reload()" class="btn btn-primary" style="margin-top: 16px;">
+                <i class="fas fa-refresh"></i> Refresh
+              </button>
+            </td>
+          </tr>
+        `;
+      }
+    }
+
+    // ==========================================
+    // SETUP EVENT LISTENERS
+    // ==========================================
+    function setupEventListeners() {
+      document.getElementById('generateSelectedBtn').addEventListener('click', generateBulkPDF);
+      document.getElementById('generateBulkBtn').addEventListener('click', generateBulkPDF);
+      document.getElementById('cancelBulkBtn').addEventListener('click', cancelBulkSelection);
+    }
+
+    // ==========================================
+    // LOAD DATA - Sesuai doGet: ?action=getData
+    // ==========================================
+    async function loadData() {
+      const url = `${SCRIPT_URL}?action=getData`;
+      const res = await fetch(url);
+      const response = await res.json();
+      
+      if (response.result !== 'success' || !Array.isArray(response.data)) {
+        throw new Error(response.message || 'Data tidak valid');
+      }
+
+      allData = response.data.map(item => {
+        const pdfLink = item.pdf_link || item.pdfLink || null;
+        
+        return {
+          rowIndex: item.rowIndex,
+          timestamp: item.timestamp,
+          nilai: item.nilai ?? '-',
+          nik: String(item.nik || '').trim(),
+          nama: item.nama || '-',
+          departemen: item.departemen || '-',
+          pdfGenerated: !!pdfLink,
+          pdfLink: pdfLink,
+          soal_1: item.soal_1 || '',
+          soal_2: item.soal_2 || '',
+          soal_3: item.soal_3 || '',
+          soal_4: item.soal_4 || '',
+          soal_5: item.soal_5 || '',
+          soal_6: item.soal_6 || '',
+          soal_7: item.soal_7 || '',
+          soal_8: item.soal_8 || '',
+          soal_9: item.soal_9 || '',
+          soal_10: item.soal_10 || '',
+          soal_11: item.soal_11 || '',
+          soal_12: item.soal_12 || '',
+          soal_13: item.soal_13 || '',
+          soal_14: item.soal_14 || '',
+          soal_15: item.soal_15 || ''
+        };
+      });
+
+      filteredData = [...allData];
+      renderTable();
+    }
+
+    // ==========================================
+    // RENDER TABLE (8 KOLOM - TANPA FACTORY)
+    // ==========================================
+    function renderTable() {
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = '';
+
+      if (filteredData.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" style="text-align: center; padding: 40px; color: #6b7280;">
+              <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+              <div style="font-size: 16px; font-weight: 600;">Tidak ada data</div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      filteredData.forEach(item => {
+        const row = document.createElement('tr');
+        const isSelected = selectedRowIndices.has(item.rowIndex);
+        
+        row.innerHTML = `
+          <td class="checkbox-cell">
+            <input type="checkbox" class="row-checkbox" 
+                   data-rowindex="${item.rowIndex}" 
+                   ${isSelected ? 'checked' : ''} 
+                   onchange="toggleSelection(${item.rowIndex})">
+          </td>
+          <td style="font-weight: 700;">${escapeHtml(item.nik)}</td>
+          <td>${escapeHtml(item.nama)}</td>
+          <td>${escapeHtml(item.departemen)}</td>
+          <td>${formatDate(item.timestamp)}</td>
+          <td style="text-align: center; font-weight: bold; color: ${getNilaiColor(item.nilai)}">
+            ${item.nilai}
+          </td>
+          <td style="text-align: center;">
+            ${item.pdfGenerated 
+              ? `<span class="status-badge status-generated"><i class="fas fa-check"></i> Sudah</span>`
+              : `<span class="status-badge status-pending"><i class="fas fa-clock"></i> Belum</span>`
+            }
+          </td>
+          <td style="text-align: center;">
+            ${item.pdfGenerated 
+              ? `<a href="${item.pdfLink}" target="_blank" class="btn btn-primary" style="padding: 6px 12px; font-size: 12px;">
+                   <i class="fas fa-download"></i> Download
+                 </a>`
+              : `<button onclick="generateSinglePDF(${item.rowIndex})" class="btn btn-success" style="padding: 6px 12px; font-size: 12px;" ${item.processing ? 'disabled' : ''}>
+                   <i class="fas fa-file-pdf"></i> ${item.processing ? 'Proses...' : 'Generate'}
+                 </button>`
+            }
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+
+      updateBulkActions();
+    }
+
+    // ==========================================
+    // HELPER: Warna berdasarkan nilai
+    // ==========================================
+    function getNilaiColor(nilai) {
+      const n = Number(nilai);
+      if (isNaN(n)) return '#6b7280';
+      if (n >= 80) return '#10b981';
+      if (n >= 60) return '#f59e0b';
+      return '#dc2626';
+    }
+
+    // ==========================================
+    // FILTER & SEARCH (TANPA FACTORY)
+    // ==========================================
+    function populateDepartmentFilter() {
+      const depts = [...new Set(allData.map(item => item.departemen).filter(Boolean))].sort();
+      const select = document.getElementById('filterDept');
+      
+      select.innerHTML = '<option value="all">Semua</option>';
+      
+      depts.forEach(dept => {
+        const option = document.createElement('option');
+        option.value = dept;
+        option.textContent = dept;
+        select.appendChild(option);
+      });
+    }
+
+    function applyFilters() {
+      const dept = document.getElementById('filterDept').value;
+      const status = document.getElementById('filterStatus').value;
+      const search = document.getElementById('searchInput').value.toLowerCase();
+
+      filteredData = allData.filter(item => {
+        const matchDept = dept === 'all' || item.departemen === dept;
+        const matchStatus = status === 'all' || 
+                           (status === 'generated' && item.pdfGenerated) ||
+                           (status === 'pending' && !item.pdfGenerated);
+        const matchSearch = !search || 
+                           (item.nama && item.nama.toLowerCase().includes(search)) ||
+                           (item.nik && item.nik.toLowerCase().includes(search));
+
+        return matchDept && matchStatus && matchSearch;
+      });
+
+      selectedRowIndices = new Set([...selectedRowIndices].filter(idx => 
+        filteredData.some(item => item.rowIndex === idx)
+      ));
+
+      renderTable();
+    }
+
+    // ==========================================
+    // SELECTION & BULK ACTIONS
+    // ==========================================
+    function toggleSelection(rowIndex) {
+      if (selectedRowIndices.has(rowIndex)) {
+        selectedRowIndices.delete(rowIndex);
+      } else {
+        selectedRowIndices.add(rowIndex);
+      }
+      updateBulkActions();
+      renderTable();
+    }
+
+    function toggleSelectAll() {
+      const checkbox = document.getElementById('selectAll');
+      
+      if (checkbox.checked) {
+        filteredData.forEach(item => {
+          if (!item.pdfGenerated) {
+            selectedRowIndices.add(item.rowIndex);
+          }
+        });
+      } else {
+        filteredData.forEach(item => selectedRowIndices.delete(item.rowIndex));
+      }
+      
+      updateBulkActions();
+      renderTable();
+    }
+
+    function updateBulkActions() {
+      const count = selectedRowIndices.size;
+      const bulkActions = document.getElementById('bulkActions');
+      const generateBtn = document.getElementById('generateSelectedBtn');
+      const bulkCount = document.getElementById('bulkCount');
+
+      document.getElementById('selectedCount').textContent = count;
+      bulkCount.textContent = count;
+
+      if (count > 0) {
+        bulkActions.classList.add('active');
+        generateBtn.disabled = false;
+      } else {
+        bulkActions.classList.remove('active');
+        generateBtn.disabled = true;
+      }
+
+      const ungeneratedInFiltered = filteredData.filter(item => !item.pdfGenerated);
+      const allSelected = ungeneratedInFiltered.length > 0 && 
+                         ungeneratedInFiltered.every(item => selectedRowIndices.has(item.rowIndex));
+      document.getElementById('selectAll').checked = allSelected;
+      document.getElementById('selectAll').indeterminate = count > 0 && !allSelected;
+    }
+
+    function cancelBulkSelection() {
+      selectedRowIndices.clear();
+      updateBulkActions();
+      renderTable();
+    }
+
+    // ==========================================
+    // GENERATE PDF (SINGLE)
+    // ==========================================
+    async function generateSinglePDF(rowIndex) {
+      const item = allData.find(d => d.rowIndex === rowIndex);
+      if (!item) {
+        alert('❌ Data tidak ditemukan');
+        return;
+      }
+
+      item.processing = true;
+      renderTable();
+      showLoading(1, item.nama);
+      
+      try {
+        const pdfLink = await generatePDFFromData(item);
+        item.pdfGenerated = true;
+        item.pdfLink = pdfLink;
+        item.processing = false;
+        
+        const filteredItem = filteredData.find(d => d.rowIndex === rowIndex);
+        if (filteredItem) {
+          filteredItem.pdfGenerated = true;
+          filteredItem.pdfLink = pdfLink;
+          filteredItem.processing = false;
+        }
+        
+        alert(`✅ PDF berhasil dibuat untuk ${item.nama}`);
+        renderTable();
+      } catch (error) {
+        console.error('Generate error:', error);
+        item.processing = false;
+        renderTable();
+        alert(`❌ Gagal: ${error.message}`);
+      } finally {
+        hideLoading();
+      }
+    }
+
+    // ==========================================
+    // GENERATE PDF (BULK)
+    // ==========================================
+    async function generateBulkPDF() {
+      const rowIndicesToProcess = [...selectedRowIndices];
+      const total = rowIndicesToProcess.length;
+      
+      if (total === 0) {
+        alert('⚠️ Tidak ada data yang dipilih');
+        return;
+      }
+
+      if (!confirm(`📄 Generate PDF untuk ${total} data?\n\nProses ini akan memakan waktu beberapa menit.\nJangan tutup halaman selama proses berlangsung.`)) {
+        return;
+      }
+
+      showLoading(total);
+
+      let successCount = 0;
+      let failCount = 0;
+      const failedItems = [];
+
+      for (let i = 0; i < rowIndicesToProcess.length; i++) {
+        const rowIndex = rowIndicesToProcess[i];
+        const item = allData.find(d => d.rowIndex === rowIndex);
+        
+        if (!item) continue;
+
+        item.processing = true;
+        const filteredItem = filteredData.find(d => d.rowIndex === rowIndex);
+        if (filteredItem) filteredItem.processing = true;
+        renderTable();
+
+        updateLoadingProgress(i + 1, total, item.nama);
+
+        try {
+          const pdfLink = await generatePDFFromData(item);
+          item.pdfGenerated = true;
+          item.pdfLink = pdfLink;
+          item.processing = false;
+          
+          if (filteredItem) {
+            filteredItem.pdfGenerated = true;
+            filteredItem.pdfLink = pdfLink;
+            filteredItem.processing = false;
+          }
+          
+          successCount++;
+        } catch (error) {
+          console.error(`Failed for ${item.nama} (row ${rowIndex}):`, error);
+          item.processing = false;
+          if (filteredItem) filteredItem.processing = false;
+          failCount++;
+          failedItems.push(`${item.nama} (${item.nik})`);
+        }
+
+        renderTable();
+        await new Promise(resolve => setTimeout(resolve, 300));
+      }
+
+      hideLoading();
+      
+      let message = `📊 Selesai!\n\n`;
+      message += `✅ Berhasil: ${successCount}\n`;
+      message += `❌ Gagal: ${failCount}`;
+      
+      if (failedItems.length > 0) {
+        message += `\n\nGagal pada:\n${failedItems.slice(0, 10).join('\n')}`;
+        if (failedItems.length > 10) {
+          message += `\n...dan ${failedItems.length - 10} lainnya`;
+        }
+      }
+      
+      alert(message);
+      
+      selectedRowIndices.clear();
+      await loadData();
+    }
+
+    // ==========================================
+    // CALL BACKEND: generatePDF - SYNTAX FIXED!
+    // ==========================================
+    async function generatePDFFromData(item) {
+      // ✅ FIX: Tambahkan key "data:" sebelum object nested
+      const payload = {
+        action: 'generatePDF',
+        data: {
+          rowIndex: item.rowIndex,
+          nik: item.nik,
+          nama: item.nama,
+          departemen: item.departemen,
+          nilai: item.nilai,
+          timestamp: item.timestamp,
+          soal_1: item.soal_1,
+          soal_2: item.soal_2,
+          soal_3: item.soal_3,
+          soal_4: item.soal_4,
+          soal_5: item.soal_5,
+          soal_6: item.soal_6,
+          soal_7: item.soal_7,
+          soal_8: item.soal_8,
+          soal_9: item.soal_9,
+          soal_10: item.soal_10,
+          soal_11: item.soal_11,
+          soal_12: item.soal_12,
+          soal_13: item.soal_13,
+          soal_14: item.soal_14,
+          soal_15: item.soal_15
+        }
+      };
+
+      // ✅ FIX CORS: Tidak pakai header Content-Type custom
+      const res = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+
+      const result = await res.json();
+
+      if (result.result !== 'success') {
+        throw new Error(result.message || 'Gagal generate PDF dari server');
+      }
+
+      return result.pdfLink;
+    }
+
+    // ==========================================
+    // LOADING UI
+    // ==========================================
+    function showLoading(total, currentName = '') {
+      document.getElementById('loadingOverlay').style.display = 'flex';
+      document.getElementById('loadingProgress').textContent = `0 / ${total}${currentName ? ` - ${currentName}` : ''}`;
+    }
+
+    function updateLoadingProgress(current, total, name) {
+      document.getElementById('loadingProgress').textContent = `${current} / ${total} - ${name}`;
+    }
+
+    function hideLoading() {
+      document.getElementById('loadingOverlay').style.display = 'none';
+    }
+
+    // ==========================================
+    // UTILITIES
+    // ==========================================
+    function escapeHtml(text) {
+      if (!text) return '-';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function formatDate(dateString) {
+      if (!dateString) return '-';
+      try {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('id-ID', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+      } catch {
+        return String(dateString);
+      }
+    }
+
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('clock').innerHTML = `
+        <div style="font-weight: bold;">${now.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })}</div>
+        <div style="font-weight: bold; font-size: 16px;">${now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' })} WIB</div>
+      `;
+    }
+
+    // ==========================================
+    // START
+    // ==========================================
+    setInterval(updateClock, 1000);
+    updateClock();
+    init();
+  </script>
+
+</body>
+</html>
