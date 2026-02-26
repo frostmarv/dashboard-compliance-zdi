@@ -17,7 +17,6 @@
       margin: 0;
       padding: 0;
     }
-
     .page-header {
       background-color: #329f96;
       color: white;
@@ -31,14 +30,12 @@
       top: 0;
       z-index: 100;
     }
-
     .page-header h1 {
       font-size: 18px;
       font-weight: bold;
       margin: 0;
       flex: 1;
     }
-
     .card {
       background-color: white;
       border: 2px solid #329f96;
@@ -46,7 +43,6 @@
       overflow: hidden;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
-
     .card-header {
       background-color: #329f96;
       color: white;
@@ -57,19 +53,16 @@
       justify-content: space-between;
       align-items: center;
     }
-
     .table-container {
       overflow-x: auto;
       max-height: 600px;
       overflow-y: auto;
     }
-
     table {
       width: 100%;
       border-collapse: collapse;
       font-size: 14px;
     }
-
     thead th {
       background-color: #329f96;
       color: white;
@@ -80,24 +73,19 @@
       top: 0;
       z-index: 10;
     }
-
     tbody tr {
       border-bottom: 1px solid #e0e0e0;
     }
-
     tbody tr:nth-child(even) {
       background-color: #f8fafc;
     }
-
     tbody tr:hover {
       background-color: #f0f8ff;
     }
-
     tbody td {
       padding: 12px 16px;
       white-space: nowrap;
     }
-
     .btn {
       padding: 8px 16px;
       border-radius: 6px;
@@ -111,50 +99,41 @@
       align-items: center;
       gap: 6px;
     }
-
     .btn-primary {
       background-color: #329f96;
       color: white;
       border-color: #329f96;
     }
-
     .btn-primary:hover {
       background-color: white;
       color: #329f96;
     }
-
     .btn-success {
       background-color: #10b981;
       color: white;
       border-color: #10b981;
     }
-
     .btn-success:hover {
       background-color: white;
       color: #10b981;
     }
-
     .btn-warning {
       background-color: #f59e0b;
       color: white;
       border-color: #f59e0b;
     }
-
     .btn-warning:hover {
       background-color: white;
       color: #f59e0b;
     }
-
     .btn:disabled {
       opacity: 0.5;
       cursor: not-allowed;
     }
-
     .checkbox-cell {
       text-align: center;
       width: 50px;
     }
-
     .status-badge {
       display: inline-flex;
       align-items: center;
@@ -164,19 +143,16 @@
       font-size: 12px;
       font-weight: 700;
     }
-
     .status-generated {
       background-color: #d1fae5;
       color: #059669;
       border: 1px solid #059669;
     }
-
     .status-pending {
       background-color: #fee2e2;
       color: #dc2626;
       border: 1px solid #dc2626;
     }
-
     .footer {
       background-color: #329f96;
       color: white;
@@ -187,7 +163,6 @@
       font-size: 14px;
       margin-top: auto;
     }
-
     .loading-overlay {
       position: fixed;
       inset: 0;
@@ -198,7 +173,6 @@
       align-items: center;
       flex-direction: column;
     }
-
     .spinner {
       width: 50px;
       height: 50px;
@@ -207,11 +181,9 @@
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
-
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
-
     .filter-section {
       padding: 16px;
       background-color: #f9fafb;
@@ -221,7 +193,6 @@
       flex-wrap: wrap;
       align-items: center;
     }
-
     .filter-section select,
     .filter-section input {
       padding: 8px 12px;
@@ -229,7 +200,6 @@
       border-radius: 6px;
       font-size: 14px;
     }
-
     .bulk-actions {
       padding: 12px 16px;
       background-color: #fef3c7;
@@ -238,7 +208,6 @@
       align-items: center;
       gap: 12px;
     }
-
     .bulk-actions.active {
       display: flex;
     }
@@ -274,7 +243,7 @@
           </div>
         </div>
 
-        <!-- FILTER (TANPA FACTORY) -->
+        <!-- FILTER -->
         <div class="filter-section">
           <label style="font-weight: 600;">Departemen:</label>
           <select id="filterDept" onchange="applyFilters()">
@@ -402,7 +371,7 @@
     }
 
     // ==========================================
-    // LOAD DATA - Sesuai doGet: ?action=getData
+    // LOAD DATA - Menerima pdfLink dari Backend
     // ==========================================
     async function loadData() {
       const url = `${SCRIPT_URL}?action=getData`;
@@ -414,7 +383,8 @@
       }
 
       allData = response.data.map(item => {
-        const pdfLink = item.pdf_link || item.pdfLink || null;
+        // ✅ Backend sekarang mengirim item.pdfLink
+        const pdfLink = item.pdfLink || null;
         
         return {
           rowIndex: item.rowIndex,
@@ -423,8 +393,8 @@
           nik: String(item.nik || '').trim(),
           nama: item.nama || '-',
           departemen: item.departemen || '-',
-          pdfGenerated: !!pdfLink,
-          pdfLink: pdfLink,
+          pdfGenerated: !!pdfLink,  // ✅ Status ditentukan oleh ada/tidaknya URL
+          pdfLink: pdfLink,         // ✅ Simpan URL
           soal_1: item.soal_1 || '',
           soal_2: item.soal_2 || '',
           soal_3: item.soal_3 || '',
@@ -448,7 +418,7 @@
     }
 
     // ==========================================
-    // RENDER TABLE (8 KOLOM - TANPA FACTORY)
+    // RENDER TABLE
     // ==========================================
     function renderTable() {
       const tbody = document.getElementById('tableBody');
@@ -519,7 +489,7 @@
     }
 
     // ==========================================
-    // FILTER & SEARCH (TANPA FACTORY)
+    // FILTER & SEARCH
     // ==========================================
     function populateDepartmentFilter() {
       const depts = [...new Set(allData.map(item => item.departemen).filter(Boolean))].sort();
@@ -738,10 +708,9 @@
     }
 
     // ==========================================
-    // CALL BACKEND: generatePDF - SYNTAX FIXED!
+    // CALL BACKEND: generatePDF
     // ==========================================
     async function generatePDFFromData(item) {
-      // ✅ FIX: Tambahkan key "data:" sebelum object nested
       const payload = {
         action: 'generatePDF',
         data: {
@@ -769,7 +738,6 @@
         }
       };
 
-      // ✅ FIX CORS: Tidak pakai header Content-Type custom
       const res = await fetch(SCRIPT_URL, {
         method: 'POST',
         body: JSON.stringify(payload)
