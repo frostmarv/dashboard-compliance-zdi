@@ -88,6 +88,8 @@
       border-radius: 12px;
       box-shadow: 0 8px 24px rgba(50, 159, 150, 0.2);
       padding: 32px;
+      position: relative;
+      z-index: 10;
     }
 
     .card-title {
@@ -119,6 +121,7 @@
       text-align: center;
       transition: all 0.3s ease;
       border: 2px solid transparent;
+      box-sizing: border-box;
     }
 
     .btn-primary {
@@ -132,6 +135,31 @@
       color: #329f96;
       transform: translateY(-2px);
       box-shadow: 0 6px 12px rgba(50, 159, 150, 0.3);
+    }
+
+    /* Tombol CTPAT - Highlight Khusus */
+    .btn-ctpat {
+      background-color: #0f766e; /* Teal lebih gelap */
+      color: white;
+      border-color: #0f766e;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-ctpat:hover {
+      background-color: white;
+      color: #0f766e;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(15, 118, 110, 0.4);
+    }
+
+    .btn-ctpat::after {
+      content: "🔒";
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 16px;
     }
 
     .btn-secondary {
@@ -316,10 +344,14 @@
     <h2 class="card-title">Dashboard Evaluasi</h2>
     <p class="card-subtitle">Monitoring hasil evaluasi training secara real-time</p>
     
+    <!-- ✅ TOMBOL BARU: EVALUASI CTPAT -->
+    <a href="evaluasi-ctpat.html" class="btn btn-ctpat">
+      Evaluasi CTPAT
+    </a>
+    
     <a href="dashboard.html" class="btn btn-primary">Dashboard Monitoring</a>
     <a href="evaluasi-dashboard/evaluasi1.html" class="btn btn-secondary">Evaluasi 1</a>
     <a href="evaluasi2.html" class="btn btn-secondary">Evaluasi 2</a>
-    <!-- Double Input Button Removed -->
   </div>
 
   <!-- FEATURES SECTION -->
@@ -365,8 +397,6 @@
   <footer class="footer">
     <p class="footer-text">© 2026 Compliance Team | Zinus Indonesia</p>
   </footer>
-
-  <!-- Script Removed (Double Input Modal Logic) -->
 
 </body>
 </html>

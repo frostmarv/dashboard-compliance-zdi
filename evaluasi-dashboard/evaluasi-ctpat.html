@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard CTPAT - Monitoring</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ===============================
+       GLOBAL THEME
+       =============================== */
+    body {
+      background-color: #e9fbf0;
+      font-family: 'Inter', Arial, sans-serif;
+      color: #333;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+
+    /* ===============================
+       HEADER - HIJAU TOSKA
+       =============================== */
+    .page-header {
+      background-color: #329f96;
+      color: white;
+      border-bottom: 2px solid #329f96;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .page-header h1 {
+      font-size: 18px;
+      font-weight: bold;
+      margin: 0;
+      letter-spacing: 0.5px;
+      flex: 1;
+    }
+
+    /* ===============================
+       TOMBOL KEMBALI
+       =============================== */
+    .btn-back-between {
+      background-color: white;
+      color: #329f96;
+      border: 2px solid #329f96;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: bold;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+      font-size: 14px;
+      white-space: nowrap;
+      max-width: 200px;
+      justify-content: center;
+      margin: 12px auto 0;
+    }
+
+    .btn-back-between:hover {
+      background-color: #329f96;
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(50, 159, 150, 0.3);
+    }
+
+    .btn-back-between svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* ===============================
+       CARD / CONTAINER
+       =============================== */
+    .card {
+      background-color: white;
+      border: 2px solid #329f96;
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .slide-header {
+      background-color: #329f96;
+      color: white;
+      padding: 12px 16px;
+      font-weight: bold;
+      font-size: 18px;
+      text-align: center;
+      flex-shrink: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* ===============================
+       TABS (PRE / POST)
+       =============================== */
+    .tabs-container {
+      display: flex;
+      background: #f3f4f6;
+      padding: 4px;
+      border-bottom: 2px solid #e5e7eb;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      background: transparent;
+      font-weight: 600;
+      color: #6b7280;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.2s;
+      font-size: 14px;
+    }
+
+    .tab-btn.active {
+      background: white;
+      color: #329f96;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .tab-btn:hover:not(.active) {
+      background: #e5e7eb;
+      color: #374151;
+    }
+
+    /* ===============================
+       TABLE CONTAINER
+       =============================== */
+    .table-container {
+      flex: 1;
+      overflow-x: auto;
+      overflow-y: auto;
+      max-height: calc(100vh - 360px);
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .table-container::-webkit-scrollbar {
+      display: none;
+    }
+
+    table {
+      width: 100%;
+      min-width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    thead {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    thead th {
+      background-color: #329f96;
+      color: white;
+      padding: 12px 16px;
+      text-align: left;
+      font-weight: bold;
+      font-size: 14px;
+      white-space: nowrap;
+      border-bottom: 2px solid #329f96;
+    }
+
+    thead th:nth-child(n+2) {
+      text-align: center;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+
+    tbody tr:hover {
+      background-color: #f0f8ff;
+    }
+
+    tbody td {
+      padding: 12px 16px;
+      white-space: nowrap;
+      font-weight: 600;
+    }
+
+    tbody td:first-child {
+      text-align: left;
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+
+    tbody td:nth-child(n+2) {
+      text-align: center;
+    }
+
+    /* ===============================
+       PROGRESS BAR IN TABLE
+       =============================== */
+    .mini-progress {
+      width: 100%;
+      height: 6px;
+      background: #e5e7eb;
+      border-radius: 3px;
+      margin-top: 6px;
+      overflow: hidden;
+    }
+    .mini-progress-bar {
+      height: 100%;
+      background: #329f96;
+      border-radius: 3px;
+      transition: width 0.5s ease;
+    }
+    .percent-text {
+      font-size: 11px;
+      color: #6b7280;
+      margin-top: 2px;
+      display: block;
+      text-align: right;
+    }
+
+    /* ===============================
+       BADGE DETAIL
+       =============================== */
+    .badge-detail {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background-color: #329f96;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-weight: bold;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      font-size: 13px;
+      border: 1px solid #329f96;
+      white-space: nowrap;
+    }
+
+    .badge-detail:hover {
+      background-color: white;
+      color: #329f96;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(50, 159, 150, 0.3);
+    }
+
+    .badge-detail svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+
+    /* ===============================
+       FOOTER
+       =============================== */
+    .footer {
+      background-color: #329f96;
+      color: white;
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      flex-shrink: 0;
+      border-top: 2px solid #329f96;
+      box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .footer-time {
+      line-height: 1.5;
+    }
+
+    .footer-time .date {
+      font-weight: bold;
+      font-size: 15px;
+    }
+
+    .footer-time .time {
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .footer-brand-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .footer-brand-item span {
+      font-weight: bold;
+      font-size: 22px;
+      letter-spacing: -0.3px;
+    }
+
+    /* ===============================
+       LOADING STATE
+       =============================== */
+    .loading {
+      text-align: center;
+      padding: 2.5rem;
+      color: #6b7280;
+    }
+
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #329f96;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ===============================
+       RESPONSIVE
+       =============================== */
+    @media (max-width: 768px) {
+      .page-header {
+        padding: 10px 12px;
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .page-header h1 {
+        font-size: 16px;
+        text-align: center;
+        width: 100%;
+        margin-top: 4px;
+      }
+
+      .btn-back-between {
+        width: 100%;
+        justify-content: center;
+        font-size: 15px;
+        padding: 10px 16px;
+        margin: 10px auto 0;
+      }
+
+      .card {
+        border-radius: 12px;
+        margin: 0 8px;
+      }
+
+      .slide-header {
+        padding: 12px;
+        font-size: 16px;
+      }
+
+      .table-container {
+        max-height: calc(100vh - 440px);
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      table {
+        min-width: 480px;
+      }
+
+      thead th {
+        padding: 10px 12px;
+        font-size: 13px;
+      }
+
+      tbody td {
+        padding: 10px 12px;
+        font-size: 13px;
+      }
+
+      .footer {
+        flex-direction: column;
+        gap: 12px;
+        padding: 16px 12px;
+        text-align: center;
+      }
+
+      .footer-brand {
+        flex-direction: column;
+        gap: 8px;
+      }
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex flex-col">
+
+  <!-- HEADER -->
+  <header class="page-header">
+    <img src="assets/images/zinus-putih.webp" alt="Logo Zinus" class="h-8" onerror="this.style.display='none'" />
+    <h1>Dashboard CTPAT — Security Awareness</h1>
+  </header>
+
+  <!-- MAIN -->
+  <main class="flex-1 p-4">
+    <div class="max-w-7xl mx-auto w-full">
+      
+      <!-- TOMBOL KEMBALI -->
+      <a href="index.html" class="btn-back-between" aria-label="Kembali ke Beranda">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Kembali ke Beranda
+      </a>
+
+      <!-- CARD -->
+      <div class="card mt-4">
+        <div class="slide-header">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+          Monitoring Partisipasi Evaluasi
+        </div>
+
+        <!-- TABS PRE / POST -->
+        <div class="tabs-container">
+          <button class="tab-btn active" onclick="switchTab('PRE')" id="tab-pre">CTPAT PRE</button>
+          <button class="tab-btn" onclick="switchTab('POST')" id="tab-post">CTPAT POST</button>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Departemen</th>
+                <th>Total Karyawan</th>
+                <th>Sudah (✓)</th>
+                <th>Belum (✗)</th>
+                <th>Progress</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="table">
+              <tr>
+                <td colspan="6" class="loading">
+                  <div class="loading-spinner"></div>
+                  <div>Memuat data CTPAT PRE...</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-time" id="clock"></div>
+    <div class="footer-brand">
+      <div class="footer-brand-item">
+        <img src="assets/images/zinus-putih.webp" class="h-10" alt="Zinus Logo" onerror="this.style.display='none'" />
+        <span>Zinus Dream Indonesia</span>
+      </div>
+      <img src="assets/images/hyundai-ori-hitam.png" class="h-10" alt="Hyundai Logo" onerror="this.style.display='none'" />
+    </div>
+  </footer>
+
+  <!-- SCRIPT -->
+  <script>
+    // =========================================================
+    // KONFIGURASI
+    // =========================================================
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyBx0GuqJOi8m55ccGxAENtiYLuUusXBqwbVOI5jH_G_Uu73tSJJ1QB0pHJ2SY_k4YZKA/exec';
+    let currentType = 'PRE';
+    let allEmployees = [];
+    let cacheResponses = { PRE: [], POST: [] };
+
+    // =========================================================
+    // INIT
+    // =========================================================
+    document.addEventListener('DOMContentLoaded', () => {
+      loadAllEmployees();
+      loadData(currentType);
+      startClock();
+    });
+
+    // =========================================================
+    // TAB SWITCHER
+    // =========================================================
+    function switchTab(type) {
+      currentType = type;
+      
+      // Update UI Tabs
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(`tab-${type.toLowerCase()}`).classList.add('active');
+      
+      // Reload Data
+      loadData(type);
+    }
+
+    // =========================================================
+    // FETCH DATA
+    // =========================================================
+    async function loadAllEmployees() {
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=getAllEmployees`);
+        const data = await res.json();
+        if (data.status === 'success') {
+          allEmployees = data.data;
+          console.log(`✅ Loaded ${allEmployees.length} employees`);
+        }
+      } catch (error) {
+        console.error('Failed to load employees:', error);
+      }
+    }
+
+    async function loadData(type) {
+      const table = document.getElementById('table');
+      table.innerHTML = `
+        <tr>
+          <td colspan="6" class="loading">
+            <div class="loading-spinner"></div>
+            <div>Memuat data CTPAT ${type}...</div>
+          </td>
+        </tr>
+      `;
+
+      try {
+        // 1. Get Responses for this type
+        const res = await fetch(`${SCRIPT_URL}?action=getResponses&type=${type}`);
+        const data = await res.json();
+        
+        if (data.status === 'success') {
+          cacheResponses[type] = data.data;
+          renderTable(type, allEmployees, data.data);
+        } else {
+          throw new Error(data.message);
+        }
+      } catch (error) {
+        console.error('Error loading data:', error);
+        table.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align: center; padding: 2.5rem; color: #dc2626;">
+              <div style="font-size: 18px; font-weight: bold; margin-bottom: 8px;">Gagal Memuat Data</div>
+              <div style="font-size: 14px; color: #6b7280;">${error.message}</div>
+              <button onclick="loadData('${type}')" class="mt-4 px-4 py-2 bg-teal-500 text-white rounded text-sm">Coba Lagi</button>
+            </td>
+          </tr>
+        `;
+      }
+    }
+
+    // =========================================================
+    // RENDER TABLE
+    // =========================================================
+    function renderTable(type, employees, responses) {
+      const table = document.getElementById('table');
+      table.innerHTML = '';
+
+      if (employees.length === 0) {
+        table.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align: center; padding: 2.5rem; color: #6b7280;">
+              <div style="font-size: 18px; font-weight: bold; margin-bottom: 8px;">Belum Ada Data Karyawan</div>
+              <div style="font-size: 14px; color: #6b7280;">Pastikan sheet "Database" sudah terisi</div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      // Group by Department
+      const deptStats = {};
+      
+      // Init all depts from employee list
+      employees.forEach(emp => {
+        if (!deptStats[emp.departemen]) {
+          deptStats[emp.departemen] = { total: 0, done: 0, submittedNiks: new Set() };
+        }
+        deptStats[emp.departemen].total++;
+      });
+
+      // Count submitted
+      const submittedNiksGlobal = new Set(responses.map(r => r.nik));
+      
+      employees.forEach(emp => {
+        if (submittedNiksGlobal.has(emp.nik)) {
+          if (deptStats[emp.departemen]) {
+            deptStats[emp.departemen].done++;
+          }
+        }
+      });
+
+      // Convert to array & sort
+      const summary = Object.keys(deptStats).map(dept => ({
+        departemen: dept,
+        total: deptStats[dept].total,
+        done: deptStats[dept].done,
+        pending: deptStats[dept].total - deptStats[dept].done
+      })).sort((a, b) => b.total - a.total);
+
+      if (summary.length === 0) {
+        table.innerHTML = `<tr><td colspan="6" class="loading">Tidak ada departemen ditemukan</td></tr>`;
+        return;
+      }
+
+      summary.forEach(item => {
+        const row = document.createElement('tr');
+        const percent = item.total > 0 ? Math.round((item.done / item.total) * 100) : 0;
+        
+        // Color logic
+        let progressColor = '#329f96';
+        if (percent < 50) progressColor = '#ef4444';
+        else if (percent < 80) progressColor = '#f59e0b';
+
+        row.innerHTML = `
+          <td>${escapeHtml(item.departemen)}</td>
+          <td style="text-align:center; font-weight:bold;">${item.total}</td>
+          <td style="text-align:center; font-weight:bold; color:#059669;">${item.done}</td>
+          <td style="text-align:center; font-weight:bold; color:#dc2626;">${item.pending}</td>
+          <td style="text-align:center; min-width: 150px;">
+            <div class="mini-progress">
+              <div class="mini-progress-bar" style="width: ${percent}%; background-color: ${progressColor};"></div>
+            </div>
+            <span class="percent-text" style="color: ${progressColor}; font-weight:bold;">${percent}%</span>
+          </td>
+          <td style="text-align:center;">
+            <a href="detail-evaluasi-ctpat.html?dept=${encodeURIComponent(item.departemen)}&type=${type}" class="badge-detail">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              Detail
+            </a>
+          </td>
+        `;
+        table.appendChild(row);
+      });
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // =========================================================
+    // CLOCK
+    // =========================================================
+    function startClock() {
+      const update = () => {
+        const now = new Date();
+        const dateStr = now.toLocaleDateString("id-ID", {
+          day: "2-digit", month: "long", year: "numeric",
+        });
+        const timeStr = now.toLocaleTimeString("id-ID", {
+          hour: "2-digit", minute: "2-digit", second: "2-digit",
+        }) + " WIB";
+        document.getElementById("clock").innerHTML = `
+          <div class="date">${dateStr}</div>
+          <div class="time">${timeStr}</div>
+        `;
+      };
+      update();
+      setInterval(update, 1000);
+    }
+  </script>
+
+</body>
+</html>
